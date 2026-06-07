@@ -3,7 +3,7 @@
     public class NewUserTemplate
     {
         private int Id { get; }
-        private string? TemplateName { get; set; }
-        private string? ADDistinguishedName { get; set; }
+        internal string? TemplateName { get; set; }
+        internal string? TemplateSAMAccountName { get; set; }
     }
 }
