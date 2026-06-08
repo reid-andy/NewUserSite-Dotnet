@@ -1,16 +1,19 @@
-﻿namespace NewUserSite.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NewUserSite.Models
 {
     public class Notification
     {
-        private int Id { get; }
-        internal bool IsEnabled { get; set; }
-        internal enum Action
+        [Key]
+        public int Id { get; set; }
+        public bool IsEnabled { get; set; }
+        public enum Action
         {
             UserCreated,
         }
-        internal string? NotificationText { get; set; }
-        internal string? NotificationSubject { get; set; }
-        internal List<AppUser> NotificationRecipients { get; set; } = new List<AppUser>();
+        public string? NotificationText { get; set; }
+        public string? NotificationSubject { get; set; }
+        public List<AppUser> NotificationRecipients { get; set; } = new List<AppUser>();
     }
 }
 

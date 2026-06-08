@@ -1,16 +1,18 @@
-﻿namespace NewUserSite.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NewUserSite.Models
 {
     public class AppUser
     {
-
-        private int Id { get; }
-        private string? Username { get; set; }
-        internal enum PermissionLevel
+        [Key]
+        public int Id { get; set; }
+        public string? Username { get; set; }
+        public enum PermissionLevel
         {
             User,
             Admin
         }
-        internal string? EmailAddress { get; set; }
+        public string? EmailAddress { get; set; }
 
     }
 }

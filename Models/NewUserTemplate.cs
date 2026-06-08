@@ -1,9 +1,12 @@
-﻿namespace NewUserSite.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NewUserSite.Models
 {
     public class NewUserTemplate
     {
-        private int Id { get; }
-        internal string? TemplateName { get; set; }
-        internal string? TemplateSAMAccountName { get; set; }
+        [Key]
+        public int Id { get; set; }
+        public string? TemplateName { get; set; }
+        public string? TemplateSAMAccountName { get; set; }
     }
 }

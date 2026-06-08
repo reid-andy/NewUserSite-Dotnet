@@ -1,10 +1,13 @@
-﻿namespace NewUserSite.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NewUserSite.Models
 {
     public class ADOrganizationalUnit
     {
-        private int Id { get; }
-        private string? Name { get; set; }
-        internal string? ADDistinguishedName { get; set; }
-        private List<NewUserTemplate>? NewUserTemplates { get; set; }
+        [Key]
+        public int Id { get; set; }
+        public string? Name { get; set; }
+        public string? ADDistinguishedName { get; set; }
+        public List<NewUserTemplate>? NewUserTemplates { get; set; }
     }
 }

@@ -1,8 +1,11 @@
-﻿namespace NewUserSite.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NewUserSite.Models
 {
     public class Hardware
     {
-        private int Id { get; }
-        internal string? Name { get; set; }
+        [Key]
+        public int Id { get; set; }
+        public string? Name { get; set; }
     }
 }

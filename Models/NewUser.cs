@@ -1,16 +1,20 @@
-﻿namespace NewUserSite.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NewUserSite.Models
 {
     public class NewUser
     {
-        private int Id { get; }
-        internal string? FirstName { get; set; }
-        internal string? LastName { get; set; }
-        internal ADOrganizationalUnit? AdOrganizationalUnit { get; set; }
-        internal NewUserTemplate? NewUserTemplate { get; set; }
-        internal string? SupervisorEmail { get; set; }
-        internal AppUser? CreatedBy { get; set; }
+        [Key]
+        public int Id { get; set; }
+        public string? FirstName { get; set; }
+        public string? LastName { get; set; }
+        public ADOrganizationalUnit? AdOrganizationalUnit { get; set; }
+        public NewUserTemplate? NewUserTemplate { get; set; }
+        public string? SupervisorEmail { get; set; }
+        public AppUser? CreatedBy { get; set; }
+        public DateTime CreatedDate { get; set; }
 
-        internal string getSAMAccountName()
+        public string getSAMAccountName()
         {
             if (this.FirstName != null && this.LastName != null)
             {
