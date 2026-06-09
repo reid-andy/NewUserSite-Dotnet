@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NewUserSite.Components;
 using NewUserSite.Data;
+using NewUserSite.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("default") ?? throw new NullReferenceException("Connection string 'default' not found.");
@@ -8,6 +9,11 @@ var connectionString = builder.Configuration.GetConnectionString("default") ?? t
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+builder.Services.AddTransient<ADOrganizationalUnitService>();
+builder.Services.AddTransient<ADSearcherService>();
+builder.Services.AddTransient<HardwareService>();
+builder.Services.AddTransient<NewUserService>();
+builder.Services.AddTransient<NewUserTemplateService>();
 builder.Services.AddDbContextFactory<NewUserDbContext>((DbContextOptionsBuilder options) => options.UseMySQL(connectionString));
 
 var app = builder.Build();

@@ -9,7 +9,13 @@ namespace NewUserSite.Data
         {
         }
 
-        public DbSet<ADSearcher> AdSearchers { get; set; }
+        public DbSet<ADSearcher> ADSearchers { get; set; }
         public DbSet<NewUser> NewUsers { get; set; }
+        public DbSet<ADOrganizationalUnit> AdOrganizationalUnits { get; set; }
+        public DbSet<NewUserTemplate> NewUserTemplates { get; set; }
+        public DbSet<AppUser> AppUsers { get; set; }
+        public DbSet<Hardware> Hardware { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+
     }
 }

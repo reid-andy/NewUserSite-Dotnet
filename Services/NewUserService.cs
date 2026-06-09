@@ -1,4 +1,6 @@
-﻿using NewUserSite.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using NewUserSite.Data;
+using NewUserSite.Models;
 using System.DirectoryServices.AccountManagement;
 using System.Runtime.Versioning;
 
@@ -8,6 +10,22 @@ namespace NewUserSite.Services
     [SupportedOSPlatform("windows")]
     public class NewUserService
     {
+
+        private IDbContextFactory<NewUserDbContext> dbContextFactory;
+
+        public NewUserService(IDbContextFactory<NewUserDbContext> dbContextFactory)
+        {
+            this.dbContextFactory = dbContextFactory;
+        }
+
+        public void AddNewUserToDatabase(NewUser newUser)
+        {
+            using (NewUserDbContext context = dbContextFactory.CreateDbContext())
+            {
+                context.NewUsers.Add(newUser);
+                context.SaveChanges();
+            }
+        }
 
         public void CreateNewUser(ADSearcher adSearcher, NewUser newUser)
         {
@@ -55,6 +73,7 @@ namespace NewUserSite.Services
                     }
                 }
 
+                AddNewUserToDatabase(newUser);
             }
         }
 
