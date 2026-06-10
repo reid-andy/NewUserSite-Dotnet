@@ -1,0 +1,59 @@
+﻿@rendermode InteractiveServer
+@page "/settings/add-template-account"
+@using NewUserSite.Models
+@using NewUserSite.Data
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.EntityFrameworkCore
+@inject NewUserSite.Services.NewUserTemplateService newUserTemplateService
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+
+<h1>Add a Template Account</h1>
+
+<EditForm Model="@newUserTemplate" FormName="AddNewUserTemplate" OnValidSubmit="@handleValidSubmit">
+    <label for="TemplateName">Template Name:</label>
+    <InputText id="TemplateName" @bind-value="@newUserTemplate.TemplateName" />
+    <label for="TemplateSAMAccountName">SAM Account Name:</label>
+    <InputText id="TemplateSAMAccountName" @bind-Value="newUserTemplate.TemplateSAMAccountName" />
+    <div>
+        <div>
+            <h2>This template is available in the following OUs:</h2>
+        </div>
+    @if (organizationalUnits?.Count > 0)
+    {
+        @foreach (var ou in organizationalUnits)
+        {
+            <div>
+                <InputCheckbox id="@ou.Name" @bind-Value="ou.IsChecked" />
+                <label for="@ou.Name">@ou.Name</label>
+            </div>
+        }
+
+    }
+    </div>
+
+    <button type="submit">Add Template</button>
+</EditForm>
+
+@code {
+    NewUserTemplate newUserTemplate = new NewUserTemplate();
+    private List<ADOrganizationalUnit> organizationalUnits = new();
+    private NewUserDbContext context;
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = dbContextFactory.CreateDbContext();
+        organizationalUnits = await context.ADOrganizationalUnits.ToListAsync();
+    }
+
+    public void Dispose()
+    {
+        context.Dispose();
+    }
+
+    public void handleValidSubmit(EditContext editContext)
+    {
+        var newTemplate = (NewUserTemplate)editContext.Model;
+        newUserTemplateService.AddNewUserTemplateToDatabase(newTemplate);
+    }
+
+}

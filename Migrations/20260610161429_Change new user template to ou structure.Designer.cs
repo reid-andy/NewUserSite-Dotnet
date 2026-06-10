@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewUserSite.Data;
 
@@ -10,29 +11,16 @@ using NewUserSite.Data;
 namespace NewUserSite.Migrations
 {
     [DbContext(typeof(NewUserDbContext))]
-    partial class NewUserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260610161429_Change new user template to ou structure")]
+    partial class Changenewusertemplatetooustructure
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            modelBuilder.Entity("ADOrganizationalUnitNewUserTemplate", b =>
-                {
-                    b.Property<int>("ADOrganizationalUnitsId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NewUserTemplatesId")
-                        .HasColumnType("int");
-
-                    b.HasKey("ADOrganizationalUnitsId", "NewUserTemplatesId");
-
-                    b.HasIndex("NewUserTemplatesId");
-
-                    b.ToTable("ADOrganizationalUnitNewUserTemplate");
-                });
 
             modelBuilder.Entity("NewUserSite.Models.ADOrganizationalUnit", b =>
                 {
@@ -43,15 +31,17 @@ namespace NewUserSite.Migrations
                     b.Property<string>("ADDistinguishedName")
                         .HasColumnType("longtext");
 
-                    b.Property<bool>("IsChecked")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("Name")
                         .HasColumnType("longtext");
 
+                    b.Property<int?>("NewUserTemplateId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
-                    b.ToTable("ADOrganizationalUnits");
+                    b.HasIndex("NewUserTemplateId");
+
+                    b.ToTable("AdOrganizationalUnits");
                 });
 
             modelBuilder.Entity("NewUserSite.Models.ADSearcher", b =>
@@ -191,19 +181,11 @@ namespace NewUserSite.Migrations
                     b.ToTable("Notifications");
                 });
 
-            modelBuilder.Entity("ADOrganizationalUnitNewUserTemplate", b =>
+            modelBuilder.Entity("NewUserSite.Models.ADOrganizationalUnit", b =>
                 {
-                    b.HasOne("NewUserSite.Models.ADOrganizationalUnit", null)
-                        .WithMany()
-                        .HasForeignKey("ADOrganizationalUnitsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("NewUserSite.Models.NewUserTemplate", null)
-                        .WithMany()
-                        .HasForeignKey("NewUserTemplatesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("ADOrganizationalUnits")
+                        .HasForeignKey("NewUserTemplateId");
                 });
 
             modelBuilder.Entity("NewUserSite.Models.AppUser", b =>
@@ -232,6 +214,11 @@ namespace NewUserSite.Migrations
                     b.Navigation("CreatedBy");
 
                     b.Navigation("NewUserTemplate");
+                });
+
+            modelBuilder.Entity("NewUserSite.Models.NewUserTemplate", b =>
+                {
+                    b.Navigation("ADOrganizationalUnits");
                 });
 
             modelBuilder.Entity("NewUserSite.Models.Notification", b =>

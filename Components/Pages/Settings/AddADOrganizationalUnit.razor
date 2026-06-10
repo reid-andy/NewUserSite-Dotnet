@@ -1,0 +1,28 @@
+﻿@rendermode InteractiveServer
+@page "/settings/user-organizational-units"
+@using NewUserSite.Models
+@using NewUserSite.Services
+@inject ADOrganizationalUnitService adOrganizationalUnitService;
+@using Microsoft.AspNetCore.Components.Forms
+
+<h1>Add Organizational Unit</h1>
+
+<EditForm Model="@adOrganizationalUnit" FormName="ADOrganizationalUnitUpdate" OnValidSubmit=@AddOU >
+    <label for="Name">Name:</label>
+    <InputText id="Name" @bind-Value="@adOrganizationalUnit.Name" />
+    <label for="ADDistinguishedName">AD Distinguished Name:</label>
+    <InputText id="ADDistinguishedName" @bind-Value="@adOrganizationalUnit.ADDistinguishedName" />
+    <button type="submit">Save Settings</button>
+
+</EditForm>
+
+@code {
+    ADOrganizationalUnit adOrganizationalUnit = new ADOrganizationalUnit();
+
+    public void AddOU(EditContext editContext)
+    {
+        var newADOrganizationalUnit = (ADOrganizationalUnit)editContext.Model;
+        adOrganizationalUnitService.AddADOrganizationalUnitToDatabase(newADOrganizationalUnit);
+    }
+
+}

@@ -17,9 +17,28 @@ namespace NewUserSite.Services
         {
             using (NewUserDbContext context = dbContextFactory.CreateDbContext())
             {
-                context.AdOrganizationalUnits.Add(adOrganizationalUnit);
+                context.ADOrganizationalUnits.Add(adOrganizationalUnit);
                 context.SaveChanges();
             }
         }
-}
+
+        public List<ADOrganizationalUnit> GetADOrganizationalUnitsFromDatabase()
+        {
+            using (NewUserDbContext context = dbContextFactory.CreateDbContext())
+            {
+                return context.ADOrganizationalUnits.ToList();
+            }
+        }
+
+        public List<ADOrganizationalUnit> GetADOrganizationalUnitsForTemplateFromDatabase(int templateId)
+        {
+            using (NewUserDbContext context = dbContextFactory.CreateDbContext())
+            {
+                return context.NewUserTemplates
+                    .Where(t => t.Id == templateId)
+                    .SelectMany(t => t.ADOrganizationalUnits)
+                    .ToList();
+            }
+        }
+    }
 }
