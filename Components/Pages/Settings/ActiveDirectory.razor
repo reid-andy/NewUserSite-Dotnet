@@ -1,4 +1,5 @@
-﻿@page "/settings/active-directory"
+﻿@rendermode InteractiveServer
+@page "/settings/active-directory"
 @using NewUserSite.Models
 @using NewUserSite.Services
 @inject ADSearcherService adSearcherService;
@@ -6,7 +7,7 @@
 
 <h1>Active Directory Settings</h1>
 
-<EditForm EditContext="@editContext" FormName="ADSearcherSettingsUpdate" OnValidSubmit="SaveSettings" >
+<EditForm Model="@adSearcher" FormName="ADSearcherSettingsUpdate" OnValidSubmit=@SaveSettings >
     <label for="Username">AD Agent Username:</label>
     <InputText id="Username" @bind-Value="@adSearcher.Username" />
     <label for="Password">AD Agent Password:</label>
@@ -23,25 +24,12 @@
 
 
 @code {
-    ADSearcher adSearcher;
-    EditContext? editContext;
+    ADSearcher adSearcher = new ADSearcher();
+    
 
-    protected override void OnInitialized()
+    public void SaveSettings(EditContext editContext)
     {
-        adSearcher = new ADSearcher();
-        editContext = new EditContext(adSearcher);
-    }
-
-    public void SaveSettings()
-    {
-        // Use the bound model instance
-        adSearcherService.AddADSearcherToDatabase(adSearcher);
+        var newAdSearcher = (ADSearcher)editContext.Model;
+        adSearcherService.AddADSearcherToDatabase(newAdSearcher);
     }
 }
-
-// Initial setup requires the following fields:
-// ADUC - User Name
-// ADUC - Password
-// ADUC - Domain Controller IP address or FQDN
-// ADUC - DC Root DN
-// ADUC - Template OU
