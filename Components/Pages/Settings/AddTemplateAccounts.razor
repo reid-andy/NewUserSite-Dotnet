@@ -50,10 +50,20 @@
         context.Dispose();
     }
 
-    public void handleValidSubmit(EditContext editContext)
+    public async Task handleValidSubmit(EditContext editContext)
     {
         var newTemplate = (NewUserTemplate)editContext.Model;
-        newUserTemplateService.AddNewUserTemplateToDatabase(newTemplate);
+
+        foreach (var ou in organizationalUnits)
+        {
+            if (ou.IsChecked)
+            {
+                newTemplate.ADOrganizationalUnits.Add(ou);
+            }
+        }
+
+        context.NewUserTemplates.Add(newTemplate);
+        await context.SaveChangesAsync();
     }
 
 }
