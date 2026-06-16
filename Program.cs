@@ -9,11 +9,7 @@ var connectionString = builder.Configuration.GetConnectionString("default") ?? t
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
-builder.Services.AddTransient<ADOrganizationalUnitService>();
-builder.Services.AddTransient<ADSearcherService>();
-builder.Services.AddTransient<HardwareService>();
 builder.Services.AddTransient<NewUserService>();
-builder.Services.AddTransient<NewUserTemplateService>();
 builder.Services.AddDbContextFactory<NewUserDbContext>((DbContextOptionsBuilder options) => options.UseMySQL(connectionString));
 
 var app = builder.Build();
