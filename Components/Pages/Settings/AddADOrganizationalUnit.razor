@@ -1,13 +1,14 @@
 ﻿@rendermode InteractiveServer
 @page "/settings/user-organizational-units"
 @using NewUserSite.Models
-@using NewUserSite.Services
-@inject ADOrganizationalUnitService adOrganizationalUnitService;
+@using NewUserSite.Data
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
 
 <h1>Add Organizational Unit</h1>
 
-<EditForm Model="@adOrganizationalUnit" FormName="ADOrganizationalUnitUpdate" OnValidSubmit=@AddOU >
+<EditForm Model="@adOrganizationalUnit" FormName="ADOrganizationalUnitUpdate" OnValidSubmit=@handleValidSubmit >
     <label for="Name">Name:</label>
     <InputText id="Name" @bind-Value="@adOrganizationalUnit.Name" />
     <label for="ADDistinguishedName">AD Distinguished Name:</label>
@@ -18,11 +19,18 @@
 
 @code {
     ADOrganizationalUnit adOrganizationalUnit = new ADOrganizationalUnit();
+    private NewUserDbContext context;
 
-    public void AddOU(EditContext editContext)
+    protected override async Task OnInitializedAsync()
     {
-        var newADOrganizationalUnit = (ADOrganizationalUnit)editContext.Model;
-        adOrganizationalUnitService.AddADOrganizationalUnitToDatabase(newADOrganizationalUnit);
+        context = dbContextFactory.CreateDbContext();
+        List<ADOrganizationalUnit> organizationalUnits = await context.ADOrganizationalUnits.ToListAsync();
     }
 
+    public async Task handleValidSubmit(EditContext editContext)
+    {
+        var newADOrganizationalUnit = (ADOrganizationalUnit)editContext.Model;
+        context.ADOrganizationalUnits.Add(newADOrganizationalUnit);
+        await context.SaveChangesAsync();
+    }
 }

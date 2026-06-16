@@ -1,13 +1,14 @@
 ﻿@rendermode InteractiveServer
 @page "/settings/active-directory"
 @using NewUserSite.Models
-@using NewUserSite.Services
-@inject ADSearcherService adSearcherService;
+@using NewUserSite.Data
 @using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
 
 <h1>Active Directory Settings</h1>
 
-<EditForm Model="@adSearcher" FormName="ADSearcherSettingsUpdate" OnValidSubmit=@SaveSettings >
+<EditForm Model="@adSearcher" FormName="ADSearcherSettingsUpdate" OnValidSubmit=@handleValidSubmit >
     <label for="Username">AD Agent Username:</label>
     <InputText id="Username" @bind-Value="@adSearcher.Username" />
     <label for="Password">AD Agent Password:</label>
@@ -25,11 +26,18 @@
 
 @code {
     ADSearcher adSearcher = new ADSearcher();
-    
+    private NewUserDbContext context;
 
-    public void SaveSettings(EditContext editContext)
+    protected override async Task OnInitializedAsync()
+    {
+        context = dbContextFactory.CreateDbContext();
+        adSearcher = await context.ADSearchers.FirstOrDefaultAsync();
+    }
+
+    public async Task handleValidSubmit(EditContext editContext)
     {
         var newAdSearcher = (ADSearcher)editContext.Model;
-        adSearcherService.AddADSearcherToDatabase(newAdSearcher);
+        context.ADSearchers.Update(newAdSearcher);
+        await context.SaveChangesAsync();
     }
 }
