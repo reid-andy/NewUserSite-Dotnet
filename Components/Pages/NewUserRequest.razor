@@ -70,6 +70,8 @@
         var newUserRequest = (NewUser)editContext.Model;
 
         newUserRequest.CreatedDate = DateTime.UtcNow;
+        newUserRequest.ADOrganizationalUnit = await context.ADOrganizationalUnits.FindAsync(selectedOuId);
+        newUserRequest.NewUserTemplate = await context.NewUserTemplates.FindAsync(selectedTemplateId);
 
         context.NewUsers.Add(newUserRequest);
         await context.SaveChangesAsync();
