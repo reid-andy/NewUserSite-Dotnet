@@ -11,7 +11,8 @@ namespace NewUserSite.Models
         public ADOrganizationalUnit? ADOrganizationalUnit { get; set; }
         public NewUserTemplate? NewUserTemplate { get; set; }
         public string? SupervisorEmail { get; set; }
-        public AppUser? CreatedBy { get; set; }
+        // Todo: Implement real auth
+        //public AppUser? CreatedBy { get; set; }
         public DateTime CreatedDate { get; set; }
 
         public string getSAMAccountName()

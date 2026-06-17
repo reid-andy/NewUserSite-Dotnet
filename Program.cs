@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using NewUserSite.Components;
 using NewUserSite.Data;
+using NewUserSite.Models;
 using NewUserSite.Services;
 
 var builder = WebApplication.CreateBuilder(args);
