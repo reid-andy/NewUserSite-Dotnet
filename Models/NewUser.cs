@@ -10,6 +10,7 @@ namespace NewUserSite.Models
         public string? LastName { get; set; }
         public ADOrganizationalUnit? ADOrganizationalUnit { get; set; }
         public NewUserTemplate? NewUserTemplate { get; set; }
+        public Domain? Domain { get; set; }
         public string? SupervisorEmail { get; set; }
         // Todo: Implement real auth
         //public AppUser? CreatedBy { get; set; }
@@ -19,7 +20,7 @@ namespace NewUserSite.Models
         {
             if (this.FirstName != null && this.LastName != null)
             {
-                return $"{this.FirstName.Substring(0, 1)}.{this.LastName}".ToLower();
+                return $"{this.FirstName}.{this.LastName}".ToLower();
             }
             else
             {
@@ -27,9 +28,33 @@ namespace NewUserSite.Models
             }
         }
 
+        public string getDisplayName()
+        {
+            if (this.FirstName != null && this.LastName != null)
+            {
+                return $"{this.FirstName} {this.LastName}";
+            }
+            else
+            {
+                throw new Exception("First name and last name must be provided to generate display name.");
+            }
+        }
+
+        public string getDistinguishedName()
+        {
+            if (this.ADOrganizationalUnit != null)
+            {
+                return $"CN={this.getSAMAccountName()},{this.ADOrganizationalUnit.ADDistinguishedName}";
+            }
+            else
+            {
+                throw new Exception("Organizational unit must be provided to generate distinguished name.");
+            }
+        }
+
         public string getEmailAddress()
         {
-            return $"{this.getSAMAccountName()}@example.com";
+            return $"{this.getSAMAccountName()}@{this.Domain}";
         }
     }
 }

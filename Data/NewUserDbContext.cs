@@ -16,6 +16,7 @@ namespace NewUserSite.Data
         public DbSet<AppUser> AppUsers { get; set; }
         public DbSet<Hardware> Hardware { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<Domain> Domains { get; set; }
 
     }
 }

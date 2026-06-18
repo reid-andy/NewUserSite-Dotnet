@@ -1,0 +1,32 @@
+﻿@rendermode InteractiveServer
+@page "/settings/add-domains"
+@using NewUserSite.Models
+@using NewUserSite.Data
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+@inject NavigationManager NavigationManager
+
+<h1>AddDomains</h1>
+
+<EditForm Model="@domain" FormName="AddDomain" OnValidSubmit="@handleValidSubmit" >
+
+    <label for="Name">Domain Name:</label>
+    <InputText id="Name" @bind-Value="@domain.Name" />
+    <button type="submit">Add Domain</button>
+
+</EditForm>
+
+
+@code {
+    private Domain domain = new Domain();
+    private NewUserDbContext context;
+
+    public async Task handleValidSubmit(EditContext editContext)
+    {
+        var newDomain = (Domain)editContext.Model;
+        context.Domains.Add(newDomain);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/settings");
+    }
+
+}

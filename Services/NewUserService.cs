@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using NewUserSite.Data;
 using NewUserSite.Models;
+using System.DirectoryServices;
 using System.DirectoryServices.AccountManagement;
+using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 
 namespace NewUserSite.Services
@@ -10,23 +12,6 @@ namespace NewUserSite.Services
     [SupportedOSPlatform("windows")]
     public class NewUserService
     {
-
-        private IDbContextFactory<NewUserDbContext> dbContextFactory;
-
-        public NewUserService(IDbContextFactory<NewUserDbContext> dbContextFactory)
-        {
-            this.dbContextFactory = dbContextFactory;
-        }
-
-        public void AddNewUserToDatabase(NewUser newUser)
-        {
-            using (NewUserDbContext context = dbContextFactory.CreateDbContext())
-            {
-                context.NewUsers.Add(newUser);
-                context.SaveChanges();
-            }
-        }
-
         public void CreateNewUser(ADSearcher adSearcher, NewUser newUser)
         {
 
@@ -51,12 +36,33 @@ namespace NewUserSite.Services
                     Console.WriteLine($"Creating new user {newUser.getSAMAccountName()}");
                     using (UserPrincipal newUserAccount = new UserPrincipal(principalContext))
                     {
+                        newUserAccount.Name = newUser.getDisplayName();
                         newUserAccount.SamAccountName = newUser.getSAMAccountName();
-                        newUserAccount.DisplayName = $"{newUser.FirstName} {newUser.LastName}";
+                        newUserAccount.DisplayName = newUser.getDisplayName();
                         newUserAccount.GivenName = newUser.FirstName;
                         newUserAccount.Surname = newUser.LastName;
                         newUserAccount.Description = templateAccount.Description;
+                        newUserAccount.UserPrincipalName = newUser.getEmailAddress();
+                        newUserAccount.EmailAddress = newUser.getEmailAddress();
+                        newUserAccount.Enabled = true;
                         newUserAccount.Save();
+
+                        try
+                        {
+                            DirectoryEntry userEntry = newUserAccount.GetUnderlyingObject() as DirectoryEntry;
+                            if (userEntry != null)
+                            {
+                                DirectoryEntry targetOU = new DirectoryEntry($"LDAP://{adSearcher.DomainControllerLocation}/{newUser.ADOrganizationalUnit.ADDistinguishedName}", adSearcher.Username, adSearcher.Password);
+                                userEntry.MoveTo(targetOU);
+                                userEntry.CommitChanges();
+                                targetOU.Close();
+                                Console.WriteLine($"{newUser.getSAMAccountName()} moved to {newUser.ADOrganizationalUnit.Name}");
+                            }
+                        }
+                        catch (COMException comEx)
+                        {
+                            Console.WriteLine($"Failed to move user to target OU: {comEx.Message}");
+                        }
                         Console.WriteLine($"New user {newUser.getSAMAccountName()} created successfully.");
                     }
                 }
@@ -68,12 +74,17 @@ namespace NewUserSite.Services
                 {
                     if (principal is GroupPrincipal group)
                     {
-                        group.Members.Add(targetAccount);
-                        group.Save();
+                        try
+                        {
+                            group.Members.Add(targetAccount);
+                            group.Save();
+                        }
+                        catch (PrincipalExistsException)
+                        {
+                            Console.WriteLine($"User {newUser.getSAMAccountName()} is already a member of group {group.SamAccountName}. Skipping.");
+                        }
                     }
                 }
-
-                AddNewUserToDatabase(newUser);
             }
         }
 

@@ -2,6 +2,7 @@
 @page "/new-user-request"
 @using NewUserSite.Models
 @using NewUserSite.Data
+@using NewUserSite.Services
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
@@ -14,6 +15,14 @@
     <InputText id="FirstName" @bind-Value="@newUser.FirstName" />
     <label for="LastName">Last Name:</label>
     <InputText id="LastName" @bind-Value="@newUser.LastName" />
+
+    <label for="Domain">Email Domain:</label>
+    <select name="Domain" id="Domain" @bind-Value="@newUser.Domain">
+        @foreach (var domain in domains)
+        {
+            <option value="domain.Id"
+        }
+    </select>
 
     <label for="ADOrganizationalUnit">ADOrganizationalUnit:</label>
     <select name="ADOrganizationalUnit" id="ADOrganizationalUnit" @onchange="OnOrganizationalUnitChanged">
@@ -36,17 +45,25 @@
 
     <label for="SupervisorEmail">Supervisor Email:</label>
     <InputText id="SupervisorEmail" @bind-Value="@newUser.SupervisorEmail" />
-    
+    @if (isLoading)
+    {
+        <div class="spinner"> ... </div>
+    } else {
     <button type="submit">Submit Request</button>
+    }
 </EditForm>
 
-@code {
+    @code {
     NewUser newUser = new NewUser();
     private NewUserDbContext context;
     private List<ADOrganizationalUnit> organizationalUnits = new();
+    private List<NewUserTemplate> availableTemplates = new();
+    private List<Domain> domains = new();
+    private ADSearcher adSearcher = new();
+    private NewUserService NewUserService = new();
     private int? selectedOuId;
     private int? selectedTemplateId;
-    private List<NewUserTemplate> availableTemplates = new();
+    private bool isLoading { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -54,6 +71,8 @@
         organizationalUnits = await context.ADOrganizationalUnits
             .Include(t => t.NewUserTemplates)
             .ToListAsync();
+        adSearcher = await context.ADSearchers.FirstOrDefaultAsync();
+        domains = await context.Domains.ToListAsync();
     }
 
     private void OnOrganizationalUnitChanged(ChangeEventArgs args)
@@ -67,11 +86,14 @@
 
     public async Task handleValidSubmit(EditContext editContext)
     {
+        isLoading = true;
         var newUserRequest = (NewUser)editContext.Model;
 
         newUserRequest.CreatedDate = DateTime.UtcNow;
         newUserRequest.ADOrganizationalUnit = await context.ADOrganizationalUnits.FindAsync(selectedOuId);
         newUserRequest.NewUserTemplate = await context.NewUserTemplates.FindAsync(selectedTemplateId);
+
+        NewUserService.CreateNewUser(adSearcher, newUserRequest);
 
         context.NewUsers.Add(newUserRequest);
         await context.SaveChangesAsync();
