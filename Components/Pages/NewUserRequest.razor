@@ -16,13 +16,13 @@
     <label for="LastName">Last Name:</label>
     <InputText id="LastName" @bind-Value="@newUser.LastName" />
 
-    <label for="Domain">Email Domain:</label>
+    @* <label for="Domain">Email Domain:</label>
     <select name="Domain" id="Domain" @bind-Value="@newUser.Domain">
         @foreach (var domain in domains)
         {
             <option value="domain.Id"
         }
-    </select>
+    </select> *@
 
     <label for="ADOrganizationalUnit">ADOrganizationalUnit:</label>
     <select name="ADOrganizationalUnit" id="ADOrganizationalUnit" @onchange="OnOrganizationalUnitChanged">
@@ -72,7 +72,7 @@
             .Include(t => t.NewUserTemplates)
             .ToListAsync();
         adSearcher = await context.ADSearchers.FirstOrDefaultAsync();
-        domains = await context.Domains.ToListAsync();
+        // domains = await context.Domains.ToListAsync();
     }
 
     private void OnOrganizationalUnitChanged(ChangeEventArgs args)

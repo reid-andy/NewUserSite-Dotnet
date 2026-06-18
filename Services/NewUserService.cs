@@ -68,28 +68,34 @@ namespace NewUserSite.Services
                 }
                 UserPrincipal targetAccount = UserPrincipal.FindByIdentity(principalContext, newUser.getSAMAccountName());
 
-                PrincipalSearchResult<Principal> templateUserGroups = templateAccount.GetGroups();
+                var templateUserGroups = templateAccount.GetGroups()
+                    .OfType<GroupPrincipal>()
+                    .Select(g => g.SamAccountName)
+                    .ToList();
 
-                foreach (Principal principal in templateUserGroups)
+                foreach (string groupName in templateUserGroups)
                 {
-                    if (principal is GroupPrincipal group)
-                    {
                         try
+                        {
+                            GroupPrincipal group = GroupPrincipal.FindByIdentity(principalContext, IdentityType.SamAccountName, groupName);
+                            if (group != null)
                         {
                             group.Members.Add(targetAccount);
                             group.Save();
                         }
-                        catch (PrincipalExistsException)
+                    }
+                    catch (PrincipalExistsException)
                         {
-                            Console.WriteLine($"User {newUser.getSAMAccountName()} is already a member of group {group.SamAccountName}. Skipping.");
+                            Console.WriteLine($"User {newUser.getSAMAccountName()} is already a member of group {groupName}. Skipping.");
+                        }
+                        catch (PrincipalOperationException ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        Console.WriteLine($"Failed to add user to group {groupName}");
                         }
                     }
                 }
             }
         }
 
-
-
-
     }
-}
