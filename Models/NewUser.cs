@@ -10,7 +10,7 @@ namespace NewUserSite.Models
         public string? LastName { get; set; }
         public ADOrganizationalUnit? ADOrganizationalUnit { get; set; }
         public NewUserTemplate? NewUserTemplate { get; set; }
-        //public Domain? Domain { get; set; }
+        public Domain? Domain { get; set; }
         public string? SupervisorEmail { get; set; }
         // Todo: Implement real auth
         //public AppUser? CreatedBy { get; set; }
@@ -54,7 +54,7 @@ namespace NewUserSite.Models
 
         public string getEmailAddress()
         {
-            return $"{this.getSAMAccountName()}@{"whitesrfs.org"}";
+            return $"{this.getSAMAccountName()}@{this.Domain.Name}";
         }
     }
 }

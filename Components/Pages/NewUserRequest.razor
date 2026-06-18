@@ -16,13 +16,15 @@
     <label for="LastName">Last Name:</label>
     <InputText id="LastName" @bind-Value="@newUser.LastName" />
 
-    @* <label for="Domain">Email Domain:</label>
-    <select name="Domain" id="Domain" @bind-Value="@newUser.Domain">
+    <label for="Domain">Email Domain:</label>
+    <select name="Domain" id="Domain" @bind="@selectedDomainId">
+        <option value="">--Select a domain--</option>
         @foreach (var domain in domains)
         {
-            <option value="domain.Id"
+            <option value="@domain.Id">@domain.Name</option>
         }
-    </select> *@
+    </select>
+    
 
     <label for="ADOrganizationalUnit">ADOrganizationalUnit:</label>
     <select name="ADOrganizationalUnit" id="ADOrganizationalUnit" @onchange="OnOrganizationalUnitChanged">
@@ -31,7 +33,7 @@
         {
             <option value="@ou.Id">@ou.Name</option>
         }
-        )
+        
     </select>
 
     <label for="NewUserTemplate">Template:</label>
@@ -63,6 +65,7 @@
     private NewUserService NewUserService = new();
     private int? selectedOuId;
     private int? selectedTemplateId;
+    private int? selectedDomainId;
     private bool isLoading { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
@@ -72,7 +75,7 @@
             .Include(t => t.NewUserTemplates)
             .ToListAsync();
         adSearcher = await context.ADSearchers.FirstOrDefaultAsync();
-        // domains = await context.Domains.ToListAsync();
+        domains = await context.Domains.ToListAsync();
     }
 
     private void OnOrganizationalUnitChanged(ChangeEventArgs args)
@@ -92,6 +95,7 @@
         newUserRequest.CreatedDate = DateTime.UtcNow;
         newUserRequest.ADOrganizationalUnit = await context.ADOrganizationalUnits.FindAsync(selectedOuId);
         newUserRequest.NewUserTemplate = await context.NewUserTemplates.FindAsync(selectedTemplateId);
+        newUserRequest.Domain = await context.Domains.FindAsync(selectedDomainId);
 
         NewUserService.CreateNewUser(adSearcher, newUserRequest);
 
