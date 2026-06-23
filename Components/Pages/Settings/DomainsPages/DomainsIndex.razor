@@ -1,0 +1,35 @@
+﻿@rendermode InteractiveServer
+@page "/settings/domains"
+@using NewUserSite.Models
+@using NewUserSite.Data
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+@inject NavigationManager NavigationManager
+
+
+
+<h1>DomainsIndex</h1>
+
+<QuickGrid Class="table" Items="context.Domains">
+
+    <PropertyColumn Property="domain => domain.Name" />
+
+    <TemplateColumn Context="domain">
+        <a href="@($"domains/edit?id={domain.Id}")">Edit</a>
+        <a href="@($"domains/delete?id={domain.Id}")">Delete</a>
+    </TemplateColumn>
+
+</QuickGrid>
+
+
+
+@code {
+    private NewUserDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = dbContextFactory.CreateDbContext();
+    }
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

@@ -12,6 +12,7 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddTransient<NewUserService>();
 builder.Services.AddDbContextFactory<NewUserDbContext>((DbContextOptionsBuilder options) => options.UseMySQL(connectionString));
+builder.Services.AddQuickGridEntityFrameworkAdapter();
 
 var app = builder.Build();
 
