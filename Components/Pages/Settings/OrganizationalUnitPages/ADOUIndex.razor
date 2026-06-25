@@ -1,0 +1,37 @@
+﻿@rendermode InteractiveServer
+@page "/settings/user-organizational-units"
+@using NewUserSite.Models
+@using NewUserSite.Data
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+@inject NavigationManager NavigationManager
+
+<h1>ADOUIndex</h1>
+
+    <a href="/settings/user-organizational-units/add">Add Organizational Unit</a>
+
+<QuickGrid Class="table" Items="context.ADOrganizationalUnits">
+
+    <PropertyColumn Property="adOrganizationalUnit => adOrganizationalUnit.Name" />
+    <PropertyColumn Property="adOrganizationalUnit => adOrganizationalUnit.ADDistinguishedName" />
+
+    <TemplateColumn Context="adOrganizationalUnit">
+        <a href="@($"organizational-units/details?id={adOrganizationalUnit.Id}")">Details</a>
+        <a href="@($"organizational-units/edit?id={adOrganizationalUnit.Id}")">Edit</a>
+        <a href="@($"organizational-units/delete?id={adOrganizationalUnit.Id}")">Delete</a>
+    </TemplateColumn>
+
+</QuickGrid>
+
+
+
+@code {
+    private NewUserDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = dbContextFactory.CreateDbContext();
+    }
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

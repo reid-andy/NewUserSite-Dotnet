@@ -1,0 +1,42 @@
+﻿@rendermode InteractiveServer
+@page "/settings/active-directory"
+@using NewUserSite.Models
+@using NewUserSite.Data
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+@inject NavigationManager NavigationManager
+
+
+<h1>Active Directory Index</h1>
+
+@if (!context.ADSearchers.Any())
+{
+    <a href="/settings/active-directory/edit">Add Active Directory Information</a>
+}
+
+<QuickGrid Class="table" Items="context.ADSearchers">
+
+    <PropertyColumn Property="adSearcher => adSearcher.Username" />
+    <PropertyColumn Property="adSearcher => adSearcher.Password" />
+    <PropertyColumn Property="adSearcher => adSearcher.DomainControllerLocation" />
+    <PropertyColumn Property="adSearcher => adSearcher.DomainControllerRoot" />
+    <PropertyColumn Property="adSearcher => adSearcher.TemplateOU" />
+
+    <TemplateColumn Context="adSearcher">
+        <a href="/settings/active-directory/edit">Edit</a>
+    </TemplateColumn>
+
+</QuickGrid>
+
+
+
+@code {
+    private NewUserDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = dbContextFactory.CreateDbContext();
+    }
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}

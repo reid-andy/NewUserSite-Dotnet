@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using NewUserSite.Components;
 using NewUserSite.Data;
-using NewUserSite.Models;
 using NewUserSite.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -24,7 +23,7 @@ using (var scope = app.Services.CreateScope())
     await context.Database.EnsureDeletedAsync();
     await context.Database.EnsureCreatedAsync();
 
-    SeedData.Initialize(services);
+    //SeedData.Initialize(services);
 }
 
 // Configure the HTTP request pipeline.

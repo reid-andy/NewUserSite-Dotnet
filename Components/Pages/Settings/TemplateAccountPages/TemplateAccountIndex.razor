@@ -1,0 +1,37 @@
+﻿@rendermode InteractiveServer
+@page "/settings/template-accounts"
+@using NewUserSite.Models
+@using NewUserSite.Data
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+@inject NavigationManager NavigationManager
+
+<h1>Template Accounts</h1>
+
+<a href="/settings/template-accounts/add">Add Template Account</a>
+
+<QuickGrid Class="table" Items="context.NewUserTemplates">
+
+    <PropertyColumn Property="newUserTemplate => newUserTemplate.TemplateName" />
+    <PropertyColumn Property="newUserTemplate => newUserTemplate.TemplateSAMAccountName" />
+
+    <TemplateColumn Context="newUserTemplate">
+        <a href="@($"template-accounts/details?id={newUserTemplate.Id}")">Details</a>
+        <a href="@($"template-accounts/edit?id={newUserTemplate.Id}")">Edit</a>
+        <a href="@($"template-accounts/delete?id={newUserTemplate.Id}")">Delete</a>
+    </TemplateColumn>
+
+</QuickGrid>
+
+
+
+@code {
+    private NewUserDbContext context = default!;
+
+    protected override void OnInitialized()
+    {
+        context = dbContextFactory.CreateDbContext();
+    }
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
