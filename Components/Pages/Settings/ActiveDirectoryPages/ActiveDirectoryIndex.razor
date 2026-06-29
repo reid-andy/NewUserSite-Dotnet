@@ -12,13 +12,13 @@
 
 @if (!context.ADSearchers.Any())
 {
-    <a href="/settings/active-directory/edit">Add Active Directory Information</a>
+    <a href="/settings/active-directory/edit" class="btn btn-primary">Add Active Directory Information</a>
 }
 
 <QuickGrid Class="table" Items="context.ADSearchers">
 
     <PropertyColumn Property="adSearcher => adSearcher.Username" />
-    <PropertyColumn Property="adSearcher => adSearcher.Password" />
+    <TemplateColumn Title="Password">****************</TemplateColumn>
     <PropertyColumn Property="adSearcher => adSearcher.DomainControllerLocation" />
     <PropertyColumn Property="adSearcher => adSearcher.DomainControllerRoot" />
     <PropertyColumn Property="adSearcher => adSearcher.TemplateOU" />

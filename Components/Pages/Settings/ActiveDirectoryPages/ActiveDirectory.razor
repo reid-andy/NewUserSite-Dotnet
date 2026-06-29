@@ -48,6 +48,6 @@
         var newAdSearcher = (ADSearcher)editContext.Model;
         context.ADSearchers.Update(newAdSearcher);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/settings");
+        NavigationManager.NavigateTo("/settings/active-directory");
     }
 }
