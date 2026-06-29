@@ -17,6 +17,8 @@
 
 </EditForm>
 
+<a href="/settings/domains" class="btn btn-secondary">Back</a>
+
 
 @code {
     private Domain domain = new Domain();
@@ -28,7 +30,7 @@
         var newDomain = (Domain)editContext.Model;
         context.Domains.Add(newDomain);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/settings");
+        NavigationManager.NavigateTo("/settings/domains");
     }
 
 }

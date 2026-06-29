@@ -34,6 +34,8 @@
     <button type="submit">Add Template</button>
 </EditForm>
 
+<a href="/settings/template-accounts" class="btn btn-secondary">Back</a>
+
 @code {
     NewUserTemplate newUserTemplate = new NewUserTemplate();
     private List<ADOrganizationalUnit> organizationalUnits = new();
@@ -70,7 +72,7 @@
 
         context.NewUserTemplates.Add(newTemplate);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/settings");
+        NavigationManager.NavigateTo("/settings/template-accounts");
     }
 
 }
