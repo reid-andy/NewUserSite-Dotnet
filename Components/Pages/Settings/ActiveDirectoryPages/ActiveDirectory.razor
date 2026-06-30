@@ -4,8 +4,10 @@
 @using NewUserSite.Data
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.DataProtection
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
 @inject NavigationManager NavigationManager
+@inject IDataProtectionProvider ProtectionProvider
 
 <h1>Active Directory Settings</h1>
 
@@ -46,6 +48,9 @@
     public async Task handleValidSubmit(EditContext editContext)
     {
         var newAdSearcher = (ADSearcher)editContext.Model;
+        var protector = ProtectionProvider.CreateProtector("ADSearcherPassword");
+        var encryptedPassword = protector.Protect(newAdSearcher.Password);
+        newAdSearcher.Password = encryptedPassword;
         context.ADSearchers.Update(newAdSearcher);
         await context.SaveChangesAsync();
         NavigationManager.NavigateTo("/settings/active-directory");

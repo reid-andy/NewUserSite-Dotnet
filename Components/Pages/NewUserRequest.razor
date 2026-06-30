@@ -5,6 +5,7 @@
 @using NewUserSite.Services
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.EntityFrameworkCore
+@inject NewUserService NewUserService
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
 @inject NavigationManager NavigationManager
 
@@ -62,7 +63,6 @@
     private List<NewUserTemplate> availableTemplates = new();
     private List<Domain> domains = new();
     private ADSearcher adSearcher = new();
-    private NewUserService NewUserService = new();
     private int? selectedOuId;
     private int? selectedTemplateId;
     private int? selectedDomainId;
