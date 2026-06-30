@@ -1,14 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.DataProtection.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using NewUserSite.Models;
 
 namespace NewUserSite.Data
 {
-    public class NewUserDbContext : DbContext
+    public class NewUserDbContext : DbContext, IDataProtectionKeyContext
     {
         public NewUserDbContext(DbContextOptions<NewUserDbContext> options) : base(options)
         {
         }
 
+        public DbSet<DataProtectionKey> DataProtectionKeys { get; set; } = null!;
         public DbSet<ADSearcher> ADSearchers { get; set; }
         public DbSet<NewUser> NewUsers { get; set; }
         public DbSet<ADOrganizationalUnit> ADOrganizationalUnits { get; set; }
