@@ -9,50 +9,66 @@
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
 @inject NavigationManager NavigationManager
 
-<h1>New User Request</h1>
+<h1 class="mb-3">New User Request</h1>
 
 <EditForm Model="@newUser" FormName="NewUserRequestForm" OnValidSubmit=@handleValidSubmit >
-    <label for="FirstName">First Name:</label>
-    <InputText id="FirstName" @bind-Value="@newUser.FirstName" />
-    <label for="LastName">Last Name:</label>
-    <InputText id="LastName" @bind-Value="@newUser.LastName" />
-
-    <label for="Domain">Email Domain:</label>
-    <select name="Domain" id="Domain" @bind="@selectedDomainId">
-        <option value="">--Select a domain--</option>
-        @foreach (var domain in domains)
-        {
-            <option value="@domain.Id">@domain.Name</option>
-        }
-    </select>
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <label class="form-label" for="FirstName">First Name:</label>
+            <InputText class="form-control col-2" id="FirstName" @bind-Value="@newUser.FirstName" />
+        </div>
+        <div class="col-md-3">
+            <label class="form-label" for="LastName">Last Name:</label>
+            <InputText class="form-control" id="LastName" @bind-Value="@newUser.LastName" />
+        </div>
     
+    <div class="col-4">
 
-    <label for="ADOrganizationalUnit">ADOrganizationalUnit:</label>
-    <select name="ADOrganizationalUnit" id="ADOrganizationalUnit" @onchange="OnOrganizationalUnitChanged">
+        <label class="form-label" for="Domain">Email Domain:</label>
+        <select class="form-select" name="Domain" id="Domain" @bind="@selectedDomainId">
+            <option value="">--Select a domain--</option>
+            @foreach (var domain in domains)
+            {
+                <option value="@domain.Id">@domain.Name</option>
+            }
+        </select>
+
+    </div>
+    </div>
+    <div class="row mb-3">
+
+    <div class="col-md-3">
+    <label class="form-label" for="ADOrganizationalUnit">Organizational Unit:</label>
+    <select class="form-select" name="ADOrganizationalUnit" id="ADOrganizationalUnit" @onchange="OnOrganizationalUnitChanged">
         <option value="">--Select an OU--</option>
         @foreach (var ou in organizationalUnits)
         {
             <option value="@ou.Id">@ou.Name</option>
         }
-        
     </select>
+        </div>
 
-    <label for="NewUserTemplate">Template:</label>
-    <select name="NewUserTemplate" id="NewUserTemplate" @bind="@selectedTemplateId" disabled="@(availableTemplates.Count == 0)">
+        <div class="col-md-3">
+    <label class="form-label" for="NewUserTemplate">Template:</label>
+    <select class="form-select" name="NewUserTemplate" id="NewUserTemplate" @bind="@selectedTemplateId" disabled="@(availableTemplates.Count == 0)">
         <option value="">@(availableTemplates.Count == 0 ? "Select an OU first" : "--Select a template--")</option>
         @foreach (var template in availableTemplates)
         {
             <option value="@template.Id">@template.TemplateName</option>
         }
     </select>
+        </div>
 
-    <label for="SupervisorEmail">Supervisor Email:</label>
-    <InputText id="SupervisorEmail" @bind-Value="@newUser.SupervisorEmail" />
+        <div class="col-md-3">
+    <label class="form-label" for="SupervisorEmail">Supervisor Email:</label>
+    <InputText class="form-control" id="SupervisorEmail" @bind-Value="@newUser.SupervisorEmail" />
+        </div>
+    </div>
     @if (isLoading)
     {
         <div class="spinner"> ... </div>
     } else {
-    <button type="submit">Submit Request</button>
+    <button class="btn btn-primary" type="submit">Submit Request</button>
     }
 </EditForm>
 
