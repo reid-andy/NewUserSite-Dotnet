@@ -1,0 +1,47 @@
+﻿@rendermode InteractiveServer
+@page "/settings/active-directory/template-OU"
+@using NewUserSite.Models
+@using NewUserSite.Data
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.DataProtection
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+@inject NavigationManager NavigationManager
+@inject IDataProtectionProvider ProtectionProvider
+
+<h1>Edit Template OU</h1>
+
+<EditForm Model="@adSearcher" FormName="ADSearcherSettingsUpdate" OnValidSubmit=@handleValidSubmit>
+    <label for="TemplateOU">Template OU DN:</label>
+    <InputText id="TemplateOU" @bind-Value="@adSearcher.TemplateOU" class="col-5" />
+    <button type="submit" class="btn btn-primary">Save Settings</button>
+
+</EditForm>
+
+<a href="/settings/active-directory" class="btn btn-secondary">Back</a>
+
+@code {
+    ADSearcher adSearcher = new ADSearcher();
+    private NewUserDbContext context;
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = dbContextFactory.CreateDbContext();
+        adSearcher = await context.ADSearchers.FirstOrDefaultAsync();
+        if (adSearcher == null)
+        {
+            adSearcher = new ADSearcher();
+            context.ADSearchers.Add(adSearcher);
+            await context.SaveChangesAsync();
+        }
+    }
+
+    public async Task handleValidSubmit(EditContext editContext)
+    {
+        var newAdSearcher = (ADSearcher)editContext.Model;
+        adSearcher.TemplateOU = newAdSearcher.TemplateOU;
+        context.ADSearchers.Update(adSearcher);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/settings/active-directory");
+    }
+}

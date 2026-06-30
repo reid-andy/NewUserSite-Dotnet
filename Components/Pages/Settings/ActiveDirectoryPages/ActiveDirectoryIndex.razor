@@ -10,35 +10,81 @@
 
 <h1>Active Directory Index</h1>
 
-@if (!context.ADSearchers.Any())
+@if (!hasADSearchers)
 {
     <a href="/settings/active-directory/edit" class="btn btn-primary">Add Active Directory Information</a>
 }
 
-<QuickGrid Class="table" Items="context.ADSearchers">
+<table class="table">
+    <thead>
+        <tr>
+        <th>Username</th>
+        <th>Password</th>
+        <th>Domain Controller Location</th>
+        <th>Domain Controller Root</th>
+        <th>Template OU</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+        @if (!editActive)
+        {
+            <td>@adSearcher.Username</td>
+            <td>*******************</td>
+            <td>@adSearcher.DomainControllerLocation</td>
+            <td>@adSearcher.DomainControllerRoot</td>
+            <td>@adSearcher.TemplateOU</td>
+        }
+        @if (editActive)
+        {
+            
+            <td><a href="/settings/active-directory/username">@adSearcher.Username</a></td>
+            <td><a href="/settings/active-directory/password">*******************</a></td>
+            <td><a href="/settings/active-directory/domain-controller-location">@adSearcher.DomainControllerLocation</a></td>
+            <td><a href="/settings/active-directory/domain-controller-root">@adSearcher.DomainControllerRoot</a></td>
+            <td><a href="/settings/active-directory/template-OU">@adSearcher.TemplateOU</a></td>
+        }
+        </tr>
+    </tbody>
+</table>
 
-    <PropertyColumn Property="adSearcher => adSearcher.Username" />
-    <TemplateColumn Title="Password">****************</TemplateColumn>
-    <PropertyColumn Property="adSearcher => adSearcher.DomainControllerLocation" />
-    <PropertyColumn Property="adSearcher => adSearcher.DomainControllerRoot" />
-    <PropertyColumn Property="adSearcher => adSearcher.TemplateOU" />
-
-    <TemplateColumn Context="adSearcher">
-        <a href="/settings/active-directory/edit">Edit</a>
-    </TemplateColumn>
-
-</QuickGrid>
-
-<a href="/settings" class="btn btn-secondary">Back</a>
+@if (!editActive)
+{
+    <button onclick="@toggleEdit" class="btn btn-warning">Edit</button>
+}
+@if (editActive)
+{
+    <button onclick="@toggleEdit" class="btn btn-danger">Cancel</button>
+}
+<a href="/settings" class="btn btn-secondary ms-3">Back</a>
 
 
 
 @code {
     private NewUserDbContext context = default!;
+    private bool editActive = false;
+    private bool hasADSearchers;
+    ADSearcher adSearcher = new ADSearcher();
 
-    protected override void OnInitialized()
+
+    private void toggleEdit()
+    {
+        if (editActive == false) { editActive = true; }
+        else { editActive = false; }
+    }
+
+    protected override async Task OnInitializedAsync()
     {
         context = dbContextFactory.CreateDbContext();
+        adSearcher = await context.ADSearchers.FirstOrDefaultAsync();
+        hasADSearchers = await context.ADSearchers.AnyAsync();
+        if (adSearcher == null)
+        {
+            adSearcher = new ADSearcher();
+            context.ADSearchers.Add(adSearcher);
+            await context.SaveChangesAsync();
+            hasADSearchers = true;
+        }
     }
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }

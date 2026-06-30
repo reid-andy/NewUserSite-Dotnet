@@ -18,17 +18,6 @@ builder.Services.AddQuickGridEntityFrameworkAdapter();
 
 var app = builder.Build();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    var context = services.GetRequiredService<NewUserDbContext>();
-
-    await context.Database.EnsureDeletedAsync();
-    await context.Database.EnsureCreatedAsync();
-
-    //SeedData.Initialize(services);
-}
-
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
