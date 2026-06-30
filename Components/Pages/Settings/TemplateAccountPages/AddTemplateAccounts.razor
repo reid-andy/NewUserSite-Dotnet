@@ -7,34 +7,38 @@
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
 @inject NavigationManager NavigationManager
 
-<h1>Add a Template Account</h1>
+<h1 class="mb-3">Add a Template Account</h1>
 
 <EditForm Model="@newUserTemplate" FormName="AddNewUserTemplate" OnValidSubmit="@handleValidSubmit">
+    <div class="mb-4">
     <label for="TemplateName">Template Name:</label>
     <InputText id="TemplateName" @bind-value="@newUserTemplate.TemplateName" />
-    <label for="TemplateSAMAccountName">SAM Account Name:</label>
+    <label for="TemplateSAMAccountName" class="ms-2">SAM Account Name:</label>
     <InputText id="TemplateSAMAccountName" @bind-Value="newUserTemplate.TemplateSAMAccountName" />
+    </div>
     <div>
         <div>
-            <h2>This template is available in the following OUs:</h2>
+            <h2>Make this template available in the following OUs:</h2>
         </div>
     @if (organizationalUnits?.Count > 0)
     {
         @foreach (var ou in organizationalUnits)
         {
-            <div>
-                <InputCheckbox id="@ou.Name" @bind-Value="ou.IsChecked" />
-                <label for="@ou.Name">@ou.Name</label>
+            <div class="input-group input-group-lg">
+                <InputCheckbox id="@ou.Name" @bind-Value="ou.IsChecked" class="form-check-input me-2 mt-2" />
+                <label for="@ou.Name" class="fs-5 text">@ou.Name</label>
             </div>
         }
 
     }
     </div>
-
-    <button type="submit">Add Template</button>
+    <div class="mt-3">
+        <a href="/settings/template-accounts" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-primary">Add Template</button>
+    </div>
 </EditForm>
 
-<a href="/settings/template-accounts" class="btn btn-secondary">Back</a>
+
 
 @code {
     NewUserTemplate newUserTemplate = new NewUserTemplate();
