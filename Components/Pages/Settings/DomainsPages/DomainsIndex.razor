@@ -1,28 +1,35 @@
 ﻿@rendermode InteractiveServer
 @page "/settings/domains"
+@using NewUserSite.Components.Shared
 @using NewUserSite.Models
 @using NewUserSite.Data
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+@inject IJSRuntime JS
 @inject NavigationManager NavigationManager
-
 
 
 <h1>Domains</h1>
 
 <a href="/settings/domains/add" class="btn btn-primary">Add a domain</a>
 
-<QuickGrid Class="table" Items="context.Domains">
+<QuickGrid Class="table" Items="domains.AsQueryable()">
 
-    <PropertyColumn Property="domain => domain.Name" />
+    <PropertyColumn Class="text fs-5 py-1" Property="domain => domain.Name" />
 
-    <TemplateColumn Context="domain">
-        <a href="@($"domains/edit?id={domain.Id}")">Edit</a>
-        <a href="@($"domains/delete?id={domain.Id}")">Delete</a>
+    <TemplateColumn Context="domain" Title="Actions" Class="fs-5">
+        <a href="@($"/settings/domains/edit?id={domain.Id}")" class="btn btn-warning py-1 my-1">Edit</a>
+        <button class="btn btn-danger py-1 my-1" @onclick="() => confirmDelete(domain.Id)">Delete</button>
     </TemplateColumn>
 
 </QuickGrid>
+
+<ConfirmModal @ref="confirmModal" 
+    ModalId="confirmDeleteModal" 
+    Title="Delete domain?" 
+    Message="Are you sure you want to delete this Domain?"
+    ConfirmText="Delete" OnConfirm="DeleteDomain" />
 
 <a href="/settings" class="btn btn-secondary">Back</a>
 
@@ -30,10 +37,42 @@
 
 @code {
     private NewUserDbContext context = default!;
+    private int Id { get; set; }
+    private ConfirmModal? confirmModal;
+    private List<Domain> domains = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         context = dbContextFactory.CreateDbContext();
+        await LoadDomainsAsync();
     }
+
+    private async Task LoadDomainsAsync()
+    {
+        domains = await context.Domains
+            .AsNoTracking()
+            .OrderBy(d => d.Name)
+            .ToListAsync();
+    }
+
+    private async Task confirmDelete(int Id)
+    {
+        if (confirmModal is not null)
+        {
+            await confirmModal.Show(Id);
+        }
+    }
+
+    private async Task DeleteDomain(int Id)
+    {
+        var domain = await context.Domains.FirstOrDefaultAsync(d => d.Id == Id);
+        if (domain is null) return;
+        context.Domains.Remove(domain);
+        await context.SaveChangesAsync();
+
+        await LoadDomainsAsync();
+        StateHasChanged();
+    }
+
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }

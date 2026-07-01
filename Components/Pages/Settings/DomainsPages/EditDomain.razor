@@ -1,0 +1,66 @@
+﻿@rendermode InteractiveServer
+@page "/settings/domains/edit"
+@using Microsoft.EntityFrameworkCore
+@using NewUserSite.Models
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+@inject NavigationManager NavigationManager
+
+
+
+
+<h1>EditDomain</h1>
+
+@if (Domain is null)
+{
+<p><em>Loading...</em></p>
+}
+else 
+{
+<EditForm Model="@Domain" FormName="EditDomain" OnValidSubmit="@UpdateDomain">
+    <div class="mb-3">
+        <label for="Name">Domain Name:</label>
+        <InputText id="Name" @bind-Value="@Domain.Name" class="col-3" />
+    </div>
+    <div>
+        <a href="/settings/domains" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-primary">Update Domain</button>
+    </div>
+    </EditForm>
+}
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private Domain? Domain { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = dbContextFactory.CreateDbContext();
+        Domain = await context.Domains.FirstOrDefaultAsync(d => d.Id == Id);
+
+        if (Domain is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+
+    private async Task UpdateDomain()
+    {
+        if (Domain is not null)
+        {
+            using var context = dbContextFactory.CreateDbContext();
+            context.Domains.Update(Domain);
+            await context.SaveChangesAsync();
+            NavigationManager.NavigateTo("/settings/domains");
+        }
+    }
+
+    private bool DomainExists(int id)
+    {
+        using var context = dbContextFactory.CreateDbContext();
+        return context.Domains.Any(e => e.Id == id);
+    }
+
+}
