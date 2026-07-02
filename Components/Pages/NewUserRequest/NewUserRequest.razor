@@ -8,6 +8,7 @@
 @inject NewUserService NewUserService
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
 @inject NavigationManager NavigationManager
+@inject DataStateService DataStateService
 
 <h1 class="mb-3">New User Request</h1>
 
@@ -117,7 +118,7 @@
 
         context.NewUsers.Add(newUserRequest);
         await context.SaveChangesAsync();
-
-        NavigationManager.NavigateTo("/");
+        DataStateService.SavedObject = newUserRequest;
+        NavigationManager.NavigateTo("/new-user-request/success");
     }
 }

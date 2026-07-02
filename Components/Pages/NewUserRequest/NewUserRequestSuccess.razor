@@ -1,0 +1,21 @@
+﻿@rendermode InteractiveServer
+@page "/new-user-request/success"
+@namespace NewUserSite.Components.NewUserRequest
+@using NewUserSite.Models
+@using NewUserSite.Services
+@inject DataStateService DataStateService
+@inject NavigationManager NavigationManager
+
+
+@if (DataStateService.SavedObject is NewUser data)
+{
+    <h2>An account for @data.getDisplayName() has been successfully created</h2>
+}
+else
+{
+    NavigationManager.NavigateTo("/error");
+}
+
+@code {
+    
+}

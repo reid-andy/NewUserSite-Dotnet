@@ -11,6 +11,7 @@ var connectionString = builder.Configuration.GetConnectionString("default") ?? t
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddTransient<NewUserService>();
+builder.Services.AddSingleton<DataStateService>();
 builder.Services.AddDbContextFactory<NewUserDbContext>((DbContextOptionsBuilder options) => options.UseMySQL(connectionString));
 builder.Services.AddDataProtection()
     .PersistKeysToDbContext<NewUserDbContext>();
