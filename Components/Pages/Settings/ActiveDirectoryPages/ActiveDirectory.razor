@@ -9,24 +9,38 @@
 @inject NavigationManager NavigationManager
 @inject IDataProtectionProvider ProtectionProvider
 
-<h1>Active Directory Settings</h1>
+<h1 class="mb-3">Active Directory Settings</h1>
 
 <EditForm Model="@adSearcher" FormName="ADSearcherSettingsUpdate" OnValidSubmit=@handleValidSubmit >
-    <label for="Username">AD Agent Username:</label>
-    <InputText id="Username" @bind-Value="@adSearcher.Username" />
-    <label for="Password">AD Agent Password:</label>
-    <InputText id="Password" @bind-Value="@adSearcher.Password" type="password" />
-    <label for="DomainControllerLocation">Domain Controller IP or FQDN:</label>
-    <InputText id="DomainControllerLocation" @bind-Value="@adSearcher.DomainControllerLocation" />
-    <label for="DomainControllerRoot">Domain Controller Root DN:</label>
-    <InputText id="DomainControllerRoot" @bind-Value="@adSearcher.DomainControllerRoot" />
-    <label for="TemplateOU">Template OU DN:</label>
-    <InputText id="TemplateOU" @bind-Value="@adSearcher.TemplateOU" />
-    <button type="submit">Save Settings</button>
-
+    <div class="row mb-3">
+        <div class="col-md-3">
+                <label class="form-label" for="Username">AD Agent Username:</label>
+            <InputText class="form-control" id="Username" @bind-Value="@adSearcher.Username" />
+        </div>
+        <div class="col-md-3">
+                <label class="form-label" for="Password">AD Agent Password:</label>
+            <InputText class="form-control" id="Password" @bind-Value="@adSearcher.Password" type="password" />
+        </div>
+        <div class="col-md-3">
+                <label class="form-label" for="DomainControllerLocation">Domain Controller IP or FQDN:</label>
+            <InputText class="form-control" id="DomainControllerLocation" @bind-Value="@adSearcher.DomainControllerLocation" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label class="form-label" for="DomainControllerRoot">Domain Controller Root DN:</label>
+            <InputText class="form-control" id="DomainControllerRoot" @bind-Value="@adSearcher.DomainControllerRoot" />
+        </div>
+        <div class="col-md-4">
+            <label class="form-label" for="TemplateOU">Template OU DN:</label>
+            <InputText class="form-control" id="TemplateOU" @bind-Value="@adSearcher.TemplateOU" />
+    
+        </div>
+    </div>
+    <button class="btn btn-primary me-3" type="submit">Save Settings</button>
+    <a href="/settings/active-directory" class="btn btn-secondary">Back</a>
 </EditForm>
 
-<a href="/settings/active-directory" class="btn btn-secondary">Back</a>
 
 
 @code {

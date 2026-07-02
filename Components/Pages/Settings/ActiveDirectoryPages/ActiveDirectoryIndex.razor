@@ -8,21 +8,32 @@
 @inject NavigationManager NavigationManager
 
 
-<h1>Active Directory Index</h1>
+<h1 class="mb-3">Active Directory Index</h1>
 
-@if (!hasADSearchers)
+@if (adSearcher.Username is null && adSearcher.Password is null)
 {
-    <a href="/settings/active-directory/edit" class="btn btn-primary">Add Active Directory Information</a>
+    <a href="/settings/active-directory/edit" class="btn btn-primary mb-3">Add Active Directory Information</a>
 }
 
 <table class="table">
     <thead>
         <tr>
+            @if (!editActive) 
+            {
         <th>Username</th>
         <th>Password</th>
         <th>Domain Controller Location</th>
-        <th>Domain Controller Root</th>
+        <th>Domain Controller Root DN</th>
         <th>Template OU</th>
+            }
+            @if (editActive)
+            {
+                <th><a href="/settings/active-directory/username">Username</a></th>
+                <th><a href="/settings/active-directory/password">Password</a></th>
+                <th><a href="/settings/active-directory/domain-controller-location">Domain Controller Location</a></th>
+                <th><a href="/settings/active-directory/domain-controller-root">Domain Controller Root</a></th>
+                <th><a href="/settings/active-directory/template-OU">Template OU</a></th>
+            }
         </tr>
     </thead>
     <tbody>
@@ -30,7 +41,12 @@
         @if (!editActive)
         {
             <td>@adSearcher.Username</td>
-            <td>*******************</td>
+                <td>
+                    @if (adSearcher.Password is not null)
+                    {
+                        <p>*******************</p>
+                    }
+                </td>
             <td>@adSearcher.DomainControllerLocation</td>
             <td>@adSearcher.DomainControllerRoot</td>
             <td>@adSearcher.TemplateOU</td>
@@ -39,8 +55,11 @@
         {
             
             <td><a href="/settings/active-directory/username">@adSearcher.Username</a></td>
-            <td><a href="/settings/active-directory/password">*******************</a></td>
-            <td><a href="/settings/active-directory/domain-controller-location">@adSearcher.DomainControllerLocation</a></td>
+                <td><a href="/settings/active-directory/password">@if (adSearcher.Password is not null) {
+                    <p>*******************</p>
+                }
+            </a></td>
+                <td><a href="/settings/active-directory/domain-controller-location">@adSearcher.DomainControllerLocation</a></td>
             <td><a href="/settings/active-directory/domain-controller-root">@adSearcher.DomainControllerRoot</a></td>
             <td><a href="/settings/active-directory/template-OU">@adSearcher.TemplateOU</a></td>
         }
@@ -83,8 +102,8 @@
             adSearcher = new ADSearcher();
             context.ADSearchers.Add(adSearcher);
             await context.SaveChangesAsync();
-            hasADSearchers = true;
-        }
+            hasADSearchers = false;
+        } 
     }
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }
