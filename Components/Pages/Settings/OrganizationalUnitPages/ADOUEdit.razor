@@ -1,0 +1,59 @@
+﻿@rendermode InteractiveServer
+@page "/settings/organizational-units/edit"
+@using Microsoft.EntityFrameworkCore
+@using NewUserSite.Models
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+@inject NavigationManager NavigationManager
+
+<h1>Edit Organizational Unit</h1>
+
+@if (adOrganizationalUnit is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <EditForm Model="@adOrganizationalUnit" FormName="EditADOrganizationalUnit" OnValidSubmit="@UpdateADOrganizationalUnit">
+        <div class="mb-3">
+            <label for="Name">Organizational Unit Name:</label>
+            <InputText id="Name" @bind-Value="@adOrganizationalUnit.Name" class="col-3" />
+            <label class="ms-2" for="ADDistinguishedName">AD Distinguished Name:</label>
+            <InputText id="ADDistinguishedName" @bind-Value="@adOrganizationalUnit.ADDistinguishedName" class="col-3" />
+        </div>
+        <div>
+            <a href="/settings/user-organizational-units" class="btn btn-secondary">Back</a>
+            <button type="submit" class="btn btn-primary">Update Organizational Unit</button>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [SupplyParameterFromQuery]
+    private int Id { get; set; }
+
+    [SupplyParameterFromForm]
+    private ADOrganizationalUnit? adOrganizationalUnit { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = dbContextFactory.CreateDbContext();
+        adOrganizationalUnit = await context.ADOrganizationalUnits.FirstOrDefaultAsync(a => a.Id == Id);
+
+        if (adOrganizationalUnit is null)
+        {
+            NavigationManager.NotFound();
+        }
+    }
+
+    private async Task UpdateADOrganizationalUnit()
+    {
+        if (adOrganizationalUnit is not null)
+        {
+            using var context = dbContextFactory.CreateDbContext();
+            context.ADOrganizationalUnits.Update(adOrganizationalUnit);
+            await context.SaveChangesAsync();
+            NavigationManager.NavigateTo("/settings/user-organizational-units");
+        }
+    }
+
+}

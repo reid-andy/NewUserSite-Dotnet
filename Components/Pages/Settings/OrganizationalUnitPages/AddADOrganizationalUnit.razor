@@ -17,7 +17,7 @@
         <InputText id="ADDistinguishedName" @bind-Value="@adOrganizationalUnit.ADDistinguishedName" class="col-3" />
     </div>
     <div class="mt-3">
-        <button class="btn btn-primary" type="submit">Save Settings</button>
+        <button class="btn btn-primary" type="submit">Save Organizational Unit</button>
         <a href="/settings/user-organizational-units" class="btn btn-secondary">Back</a>
     </div>
 </EditForm>
@@ -39,6 +39,6 @@
         var newADOrganizationalUnit = (ADOrganizationalUnit)editContext.Model;
         context.ADOrganizationalUnits.Add(newADOrganizationalUnit);
         await context.SaveChangesAsync();
-        NavigationManager.NavigateTo("/settings");
+        NavigationManager.NavigateTo("/settings/user-organizational-units");
     }
 }

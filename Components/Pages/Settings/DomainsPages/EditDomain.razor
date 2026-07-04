@@ -5,9 +5,6 @@
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
 @inject NavigationManager NavigationManager
 
-
-
-
 <h1>EditDomain</h1>
 
 @if (Domain is null)
@@ -55,12 +52,6 @@ else
             await context.SaveChangesAsync();
             NavigationManager.NavigateTo("/settings/domains");
         }
-    }
-
-    private bool DomainExists(int id)
-    {
-        using var context = dbContextFactory.CreateDbContext();
-        return context.Domains.Any(e => e.Id == id);
     }
 
 }

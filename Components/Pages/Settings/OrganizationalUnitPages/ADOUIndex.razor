@@ -18,7 +18,7 @@
     <PropertyColumn Property="adOrganizationalUnit => adOrganizationalUnit.ADDistinguishedName" Title="AD Distinguished Name" />
 
     <TemplateColumn Context="adOrganizationalUnit" Title="Actions" Class="fs-5">
-        <a href="@($"organizational-units/edit?id={adOrganizationalUnit.Id}")" class="btn btn-warning py-1 my-1"">Edit</a>
+        <a href="@($"/settings/organizational-units/edit?id={adOrganizationalUnit.Id}")" class="btn btn-warning py-1 my-1"">Edit</a>
         <button class="btn btn-danger py-1 my-1" @onclick="() => confirmDelete(adOrganizationalUnit.Id)">Delete</button>
     </TemplateColumn>
 
