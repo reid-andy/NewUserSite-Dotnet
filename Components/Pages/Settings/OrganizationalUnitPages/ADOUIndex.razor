@@ -2,6 +2,7 @@
 @page "/settings/user-organizational-units"
 @using NewUserSite.Models
 @using NewUserSite.Data
+@using NewUserSite.Components.Shared
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
@@ -11,27 +12,63 @@
 
     <a href="/settings/user-organizational-units/add" class="btn btn-primary mb-2">Add Organizational Unit</a>
 
-<QuickGrid Class="table" Items="context.ADOrganizationalUnits">
+<QuickGrid Class="table" Items="ous.AsQueryable()">
 
     <PropertyColumn Property="adOrganizationalUnit => adOrganizationalUnit.Name" />
-    <PropertyColumn Property="adOrganizationalUnit => adOrganizationalUnit.ADDistinguishedName" />
+    <PropertyColumn Property="adOrganizationalUnit => adOrganizationalUnit.ADDistinguishedName" Title="AD Distinguished Name" />
 
-    <TemplateColumn Context="adOrganizationalUnit">
-        <a href="@($"organizational-units/details?id={adOrganizationalUnit.Id}")">Details</a>
-        <a href="@($"organizational-units/edit?id={adOrganizationalUnit.Id}")">Edit</a>
-        <a href="@($"organizational-units/delete?id={adOrganizationalUnit.Id}")">Delete</a>
+    <TemplateColumn Context="adOrganizationalUnit" Title="Actions" Class="fs-5">
+        <a href="@($"organizational-units/edit?id={adOrganizationalUnit.Id}")" class="btn btn-warning py-1 my-1"">Edit</a>
+        <button class="btn btn-danger py-1 my-1" @onclick="() => confirmDelete(adOrganizationalUnit.Id)">Delete</button>
     </TemplateColumn>
 
 </QuickGrid>
+
+<ConfirmModal @ref="confirmModal" 
+    ModalId="confirmDeleteModal" 
+    Title="Delete Organizational Unit?" 
+    Message="Are you sure you want to delete this OU?"
+    ConfirmText="Delete" OnConfirm="DeleteOU" />
 
 <a href="/settings" class="btn btn-secondary">Back</a>
 
 @code {
     private NewUserDbContext context = default!;
+    private ConfirmModal? confirmModal;
+    private List<ADOrganizationalUnit> ous = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         context = dbContextFactory.CreateDbContext();
+        await LoadOUsAsync();
     }
+
+    private async Task LoadOUsAsync()
+    {
+        ous = await context.ADOrganizationalUnits
+            .AsNoTracking()
+            .OrderBy(d => d.Name)
+            .ToListAsync();
+    }
+
+    private async Task confirmDelete(int Id)
+    {
+        if (confirmModal is not null)
+        {
+            await confirmModal.Show(Id);
+        }
+    }
+
+    private async Task DeleteOU(int Id)
+    {
+        var ou = await context.ADOrganizationalUnits.FirstOrDefaultAsync(d => d.Id == Id);
+        if (ou is null) return;
+        context.ADOrganizationalUnits.Remove(ou);
+        await context.SaveChangesAsync();
+
+        await LoadOUsAsync();
+        StateHasChanged();
+    }
+    
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }

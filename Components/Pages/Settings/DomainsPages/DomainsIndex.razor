@@ -6,7 +6,6 @@
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
-@inject IJSRuntime JS
 @inject NavigationManager NavigationManager
 
 
@@ -16,9 +15,9 @@
 
 <QuickGrid Class="table" Items="domains.AsQueryable()">
 
-    <PropertyColumn Class="text fs-5 py-1" Property="domain => domain.Name" />
+    <PropertyColumn Class="text py-1" Property="domain => domain.Name" />
 
-    <TemplateColumn Context="domain" Title="Actions" Class="fs-5">
+    <TemplateColumn Context="domain" Title="Actions">
         <a href="@($"/settings/domains/edit?id={domain.Id}")" class="btn btn-warning py-1 my-1">Edit</a>
         <button class="btn btn-danger py-1 my-1" @onclick="() => confirmDelete(domain.Id)">Delete</button>
     </TemplateColumn>
@@ -37,7 +36,6 @@
 
 @code {
     private NewUserDbContext context = default!;
-    private int Id { get; set; }
     private ConfirmModal? confirmModal;
     private List<Domain> domains = new();
 
