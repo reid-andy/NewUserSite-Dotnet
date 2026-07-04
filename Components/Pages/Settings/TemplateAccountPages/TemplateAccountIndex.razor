@@ -2,6 +2,7 @@
 @page "/settings/template-accounts"
 @using NewUserSite.Models
 @using NewUserSite.Data
+@using NewUserSite.Components.Shared
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
@@ -11,27 +12,64 @@
 
 <a href="/settings/template-accounts/add" class="btn btn-primary">Add Template Account</a>
 
-<QuickGrid Class="table" Items="context.NewUserTemplates">
+<QuickGrid Class="table" Items="newUserTemplates.AsQueryable()">
 
-    <PropertyColumn Property="newUserTemplate => newUserTemplate.TemplateName" />
-    <PropertyColumn Property="newUserTemplate => newUserTemplate.TemplateSAMAccountName" />
+    <PropertyColumn Property="newUserTemplate => newUserTemplate.TemplateName" Title="Template Name"/>
+    <PropertyColumn Property="newUserTemplate => newUserTemplate.TemplateSAMAccountName" Title="Template SAM Account Name"/>
 
     <TemplateColumn Context="newUserTemplate">
-        <a href="@($"template-accounts/details?id={newUserTemplate.Id}")">Details</a>
-        <a href="@($"template-accounts/edit?id={newUserTemplate.Id}")">Edit</a>
-        <a href="@($"template-accounts/delete?id={newUserTemplate.Id}")">Delete</a>
+        <a href="@($"/settings/template-accounts/details?id={newUserTemplate.Id}")" class="btn btn-info py-1 my-1">Details</a>
+        <a href="@($"/settings/template-accounts/edit?id={newUserTemplate.Id}")" class="btn btn-warning py-1 my-1">Edit</a>
+        <button class="btn btn-danger py-1 my-1" @onclick="() => confirmDelete(newUserTemplate.Id)">Delete</button>
     </TemplateColumn>
 
 </QuickGrid>
+
+<ConfirmModal @ref="confirmModal"
+              ModalId="confirmDeleteModal"
+              Title="Delete Template?"
+              Message="Are you sure you want to delete this Template?"
+              ConfirmText="Delete" OnConfirm="DeleteTemplate" />
 
 <a href="/settings" class="btn btn-secondary">Back</a>
 
 @code {
     private NewUserDbContext context = default!;
+    private ConfirmModal? confirmModal;
+    private List<NewUserTemplate> newUserTemplates = new();
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         context = dbContextFactory.CreateDbContext();
+        await LoadTemplatesAsync();
     }
+
+    private async Task LoadTemplatesAsync()
+    {
+        newUserTemplates = await context.NewUserTemplates
+            .AsNoTracking()
+            .OrderBy(d => d.TemplateName)
+            .ToListAsync();
+    }
+
+    private async Task confirmDelete(int Id)
+    {
+        if (confirmModal is not null)
+        {
+            await confirmModal.Show(Id);
+        }
+    }
+
+    private async Task DeleteTemplate(int Id)
+    {
+        var newUserTemplate = await context.NewUserTemplates.FirstOrDefaultAsync(t => t.Id == Id);
+        if (newUserTemplate is null) return;
+        context.NewUserTemplates.Remove(newUserTemplate);
+        await context.SaveChangesAsync();
+
+        await LoadTemplatesAsync();
+        StateHasChanged();
+    }
+
     public async ValueTask DisposeAsync() => await context.DisposeAsync();
 }
