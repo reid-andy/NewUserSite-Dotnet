@@ -10,6 +10,10 @@
 @if (DataStateService.SavedObject is NewUser data)
 {
     <h2>An account for @data.getDisplayName() has been successfully created</h2>
+
+    <div class="mt-3">
+        <a href="/new-user-request" class="btn btn-success">Submit Another Request</a>
+    </div>
 }
 else
 {
