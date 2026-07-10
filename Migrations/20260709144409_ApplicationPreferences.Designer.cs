@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewUserSite.Data;
 
@@ -10,9 +11,11 @@ using NewUserSite.Data;
 namespace NewUserSite.Migrations
 {
     [DbContext(typeof(NewUserDbContext))]
-    partial class NewUserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260709144409_ApplicationPreferences")]
+    partial class ApplicationPreferences
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,25 +123,6 @@ namespace NewUserSite.Migrations
                     b.HasIndex("NotificationId");
 
                     b.ToTable("AppUsers");
-                });
-
-            modelBuilder.Entity("NewUserSite.Models.ApplicationPreferences", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    b.Property<string>("OrganizationalUnit")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Template")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ApplicationPreferences");
                 });
 
             modelBuilder.Entity("NewUserSite.Models.Domain", b =>
