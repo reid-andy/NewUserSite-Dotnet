@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewUserSite.Data;
 
@@ -10,9 +11,11 @@ using NewUserSite.Data;
 namespace NewUserSite.Migrations
 {
     [DbContext(typeof(NewUserDbContext))]
-    partial class NewUserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260711212956_ApplicationPreferencesDefaults")]
+    partial class ApplicationPreferencesDefaults
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -145,14 +148,6 @@ namespace NewUserSite.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ApplicationPreferences");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            OrganizationalUnit = "Department",
-                            Template = "Job Title"
-                        });
                 });
 
             modelBuilder.Entity("NewUserSite.Models.Domain", b =>

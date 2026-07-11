@@ -20,5 +20,26 @@ namespace NewUserSite.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Domain> Domains { get; set; }
         public DbSet<ApplicationPreferences> ApplicationPreferences { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ApplicationPreferences>()
+                .HasData(new ApplicationPreferences
+                {
+                    Id = 1,
+                    OrganizationalUnit = "Department",
+                    Template = "Job Title"
+                });
+
+            modelBuilder.Entity<ApplicationPreferences>()
+                .Property(ap => ap.OrganizationalUnit)
+                .HasDefaultValue("Department");
+
+            modelBuilder.Entity<ApplicationPreferences>()
+                .Property(ap => ap.Template)
+                .HasDefaultValue("Job Title");
+        }
     }
 }

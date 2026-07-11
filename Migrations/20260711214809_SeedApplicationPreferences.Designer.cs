@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewUserSite.Data;
 
@@ -10,9 +11,11 @@ using NewUserSite.Data;
 namespace NewUserSite.Migrations
 {
     [DbContext(typeof(NewUserDbContext))]
-    partial class NewUserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260711214809_SeedApplicationPreferences")]
+    partial class SeedApplicationPreferences
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

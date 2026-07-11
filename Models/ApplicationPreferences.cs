@@ -1,6 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.DirectoryServices;
-using System.Runtime.Versioning;
 
 
 namespace NewUserSite.Models
@@ -9,7 +7,9 @@ namespace NewUserSite.Models
     {
         [Key]
         public int Id { get; set; }
+        [MaxLength(100)]
         public string OrganizationalUnit { get; set; } = "Department";
+        [MaxLength(100)]
         public string Template { get; set; } = "Job Title";
 
     }

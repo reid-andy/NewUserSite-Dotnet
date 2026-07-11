@@ -39,7 +39,7 @@
     <div class="row mb-3">
 
     <div class="col-md-3">
-    <label class="form-label" for="ADOrganizationalUnit">Organizational Unit:</label>
+    <label class="form-label" for="ADOrganizationalUnit">@preferences.OrganizationalUnit:</label>
     <select class="form-select" name="ADOrganizationalUnit" id="ADOrganizationalUnit" @onchange="OnOrganizationalUnitChanged">
         <option value="">--Select an OU--</option>
         @foreach (var ou in organizationalUnits)
@@ -50,7 +50,7 @@
         </div>
 
         <div class="col-md-3">
-    <label class="form-label" for="NewUserTemplate">Template:</label>
+    <label class="form-label" for="NewUserTemplate">@preferences.Template:</label>
     <select class="form-select" name="NewUserTemplate" id="NewUserTemplate" @bind="@selectedTemplateId" disabled="@(availableTemplates.Count == 0)">
         <option value="">@(availableTemplates.Count == 0 ? "Select an OU first" : "--Select a template--")</option>
         @foreach (var template in availableTemplates)
@@ -79,10 +79,10 @@
 
     @code {
     NewUser newUser = new NewUser();
-    private NewUserDbContext context;
     private List<ADOrganizationalUnit> organizationalUnits = new();
     private List<NewUserTemplate> availableTemplates = new();
     private List<Domain> domains = new();
+    private ApplicationPreferences preferences = new();
     private ADSearcher adSearcher = new();
     private int? selectedOuId;
     private int? selectedTemplateId;
@@ -91,12 +91,13 @@
 
     protected override async Task OnInitializedAsync()
     {
-        context = dbContextFactory.CreateDbContext();
+        using var context = dbContextFactory.CreateDbContext();
         organizationalUnits = await context.ADOrganizationalUnits
             .Include(t => t.NewUserTemplates)
             .ToListAsync();
         adSearcher = await context.ADSearchers.FirstOrDefaultAsync();
         domains = await context.Domains.ToListAsync();
+        preferences = await context.ApplicationPreferences.FirstOrDefaultAsync();
     }
 
     private void OnOrganizationalUnitChanged(ChangeEventArgs args)
@@ -122,6 +123,7 @@
     public async Task createNewUserAsync(EditContext editContext)
     {
         var newUserRequest = (NewUser)editContext.Model;
+        using var context = dbContextFactory.CreateDbContext();
 
         newUserRequest.CreatedDate = DateTime.UtcNow;
         newUserRequest.ADOrganizationalUnit = await context.ADOrganizationalUnits.FindAsync(selectedOuId);

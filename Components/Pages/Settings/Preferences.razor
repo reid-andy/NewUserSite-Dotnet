@@ -1,5 +1,11 @@
 ﻿@rendermode InteractiveServer
 @page "/settings/preferences"
+@using NewUserSite.Models
+@using NewUserSite.Data
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+@inject NavigationManager NavigationManager
 
 <h1 class="mb-3">Preferences</h1>
 
@@ -8,16 +14,74 @@
         Here you can change the verbiage reflected on the new user request page if so desired. 
     </p>
     <p>
-        By default, these are set to terms that relate better for non-technical (human resources) users.
+        By default, these are set to terms that relate better for non-technical users.
     </p>
 </div>
 
-
-<div>
-  
-</div>
+@if (preferences is null)
+{
+    <p>Loading preferences...</p>
+}
+else
+{
+    @if(editMode) {
+    <EditForm Model="@preferences" FormName="PreferencesForm" OnValidSubmit="@handleValidSubmit">
+        <div class="mb-3">
+            <label for="OrganizationalUnit">Organizational Unit:</label>
+            <InputText id="OrganizationalUnit" @bind-Value="@preferences.OrganizationalUnit" class="col-3" />
+        </div>
+        <div class="mb-3">
+            <label for="Template">Template Account:</label>
+            <InputText id="Template" @bind-Value="@preferences.Template" class="col-3" />
+        </div>
+        <div>
+            <a href="/settings" class="btn btn-secondary">Back</a>
+            <button type="submit" class="btn btn-primary">Save Preferences</button>
+            <button type="button" class="btn btn-danger" @onclick="@toggleEdit">Cancel</button>
+        </div>
+    </EditForm>
+    }
+    else
+    {
+        <div class="mb-3">
+            Organizational Unit: @preferences.OrganizationalUnit
+        </div>
+        <div class="mb-3">
+            Template Account: @preferences.Template
+        </div>
+        <div>
+            <a href="/settings" class="btn btn-secondary">Back</a>
+            <button type="button" class="btn btn-warning" @onclick="@toggleEdit">Edit Preferences</button>
+        </div>
+    }
+}
 
 
 @code {
+    private ApplicationPreferences? preferences { get; set; }
+    private bool editMode { get; set; } = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = dbContextFactory.CreateDbContext();
+        preferences ??= await context.ApplicationPreferences.FirstOrDefaultAsync();
+    }
+
+    private async Task handleValidSubmit(EditContext editContext)
+    {
+        using var context = dbContextFactory.CreateDbContext();
+        var updatedPreferences = (ApplicationPreferences)editContext.Model;
+        context.ApplicationPreferences.Update(updatedPreferences);
+
+        await context.SaveChangesAsync();
+        toggleEdit();
+    }
+
+    private void toggleEdit()
+    {
+        if (editMode) { editMode = false; }
+        else { editMode = true; }
+        StateHasChanged();
+    }
 
 }
