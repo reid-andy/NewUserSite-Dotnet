@@ -3,6 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using NewUserSite.Components;
 using NewUserSite.Data;
 using NewUserSite.Services;
+using Microsoft.AspNetCore.Authentication.Negotiate;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Components.Server.Circuits;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("default") ?? throw new NullReferenceException("Connection string 'default' not found.");
@@ -11,11 +14,20 @@ var connectionString = builder.Configuration.GetConnectionString("default") ?? t
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddTransient<NewUserService>();
-builder.Services.AddSingleton<DataStateService>();
+builder.Services.AddScoped<DataStateService>();
 builder.Services.AddDbContextFactory<NewUserDbContext>((DbContextOptionsBuilder options) => options.UseMySQL(connectionString));
 builder.Services.AddDataProtection()
     .PersistKeysToDbContext<NewUserDbContext>();
 builder.Services.AddQuickGridEntityFrameworkAdapter();
+builder.Services.AddAuthentication(NegotiateDefaults.AuthenticationScheme)
+    .AddNegotiate();
+builder.Services.AddAuthorization(options =>
+{
+    // By default, all incoming requests will be authorized according to the default policy.
+    options.FallbackPolicy = options.DefaultPolicy;
+});
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<UserStateService>();
 
 var app = builder.Build();
 
@@ -34,5 +46,8 @@ app.UseAntiforgery();
 app.MapStaticAssets();
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.Run();
