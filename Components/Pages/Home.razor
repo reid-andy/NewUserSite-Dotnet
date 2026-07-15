@@ -4,32 +4,39 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using NewUserSite.Services
-@inject NewUserSite.Services.UserStateService UserStateService
+@inject UserStateService UserStateService
 
 <PageTitle>Home</PageTitle>
 
          <h1>Home</h1>
 
-         <AuthorizeView>
-        <p>Hello @UserStateService.CurrentUser.DisplayName</p>
-        <p>SAM Account Name: @UserStateService.CurrentUser.SamAccountName</p>
-        <p>User Principal Name: @UserStateService.CurrentUser.UserPrincipalName</p>
-    <p>Groups: </p>
-    <ul>
-            @foreach (var group in UserStateService.CurrentUser.Groups)
-        {
-            <li>@group.Name</li>
-        }
-        )
-    </ul>
-             
-</AuthorizeView>
+         @if (!UserStateService.IsInitialized)
+{
+    <p>Loading...</p>
+}
+else
+{
+    @if(UserStateService.CurrentPrincipal is not null && UserStateService.CurrentPrincipal.IsInRole("Domain Admins"))
+    {
+        <p>You are an Admin!</p>
+    }
+    else
+    {
+        <p>You are a standard user.</p>
+    }
+}
 
 
 Welcome to your new app.
 
-    @code {
-    [CascadingParameter]
-    public AdUserInfo? CurrentUser { get; set; }
+@code {
+    protected override void OnInitialized()
+    {
+        UserStateService.OnChange += StateHasChanged;
+    }
 
+    public void Dispose()
+    {
+        UserStateService.OnChange -= StateHasChanged;
+    }
 }

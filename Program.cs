@@ -28,6 +28,7 @@ builder.Services.AddAuthorization(options =>
 });
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddScoped<UserStateService>();
+builder.Services.AddScoped<IClaimsTransformation, AdClaimsTransformer>();
 
 var app = builder.Build();
 

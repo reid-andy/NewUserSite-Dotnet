@@ -1,11 +1,13 @@
 ﻿using System.DirectoryServices.AccountManagement;
+using System.Runtime.Versioning;
+using System.Security.Claims;
 using System.Security.Principal;
 
 namespace NewUserSite.Services;
 
 public record AdGroupInfo(string Name, string Sid);
 public record AdUserInfo(string DisplayName, string SamAccountName, string UserPrincipalName, List<AdGroupInfo> Groups);
-
+[SupportedOSPlatform("windows")]
 public class UserStateService
 {
     private readonly ILogger<UserStateService> _logger;
@@ -14,14 +16,26 @@ public class UserStateService
     {
         _logger = logger;
     }
+    public ClaimsPrincipal? CurrentPrincipal { get; private set; }
     public AdUserInfo? CurrentUser { get; private set; }
+    public bool IsInitialized { get; private set; }
     public event Action? OnChange;
-    public void SetCurrentUser(AdUserInfo? user)
+    public void SetCurrentUser(AdUserInfo? user, ClaimsPrincipal? principal = null)
     {
         CurrentUser = user;
+        CurrentPrincipal = principal;
+        IsInitialized = true;
         OnChange?.Invoke();
         _logger?.LogInformation("UserStateService.SetCurrentUser called. Has user: {HasUser}", user != null);
     }
+
+    public void SetInitialized()
+    {
+        IsInitialized = true;
+        OnChange?.Invoke();
+    }
+
+
     // Note: System.DirectoryServices.AccountManagement APIs are synchronous; wrap in Task.Run for async callers.
     public Task<AdUserInfo?> GetUserAndGroupsAsync(string domainUsername)
     {

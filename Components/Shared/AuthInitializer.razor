@@ -1,0 +1,35 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using NewUserSite.Services
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject UserStateService UserStateService
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var principal = authState.User;
+
+            if (principal.Identity?.IsAuthenticated == true)
+            {
+                var name = principal.Identity.Name;
+                if (!string.IsNullOrEmpty(name))
+                {
+                    var adUser = await UserStateService.GetUserAndGroupsAsync(name);
+                    UserStateService.SetCurrentUser(adUser, principal);
+                }
+            }
+            else
+            {
+                UserStateService.SetInitialized();
+            }
+        } 
+        catch(Exception ex)
+        {
+            Console.WriteLine("Error in AuthInitializer");
+            UserStateService.SetInitialized();
+        }
+    }
+
+}
