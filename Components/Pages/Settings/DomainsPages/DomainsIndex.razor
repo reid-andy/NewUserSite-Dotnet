@@ -1,10 +1,10 @@
 ﻿@rendermode InteractiveServer
 @page "/settings/domains"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.EntityFrameworkCore
 @using NewUserSite.Components.Shared
 @using NewUserSite.Models
 @using NewUserSite.Data
-@using Microsoft.AspNetCore.Components.QuickGrid
-@using Microsoft.EntityFrameworkCore
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
 @inject NavigationManager NavigationManager
 

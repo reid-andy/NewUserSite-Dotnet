@@ -4,39 +4,39 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using NewUserSite.Services
-@inject UserStateService UserStateService
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <PageTitle>Home</PageTitle>
 
          <h1>Home</h1>
 
-         @if (!UserStateService.IsInitialized)
-{
-    <p>Loading...</p>
-}
-else
-{
-    @if(UserStateService.CurrentPrincipal is not null && UserStateService.CurrentPrincipal.IsInRole("Domain Admins"))
-    {
-        <p>You are an Admin!</p>
-    }
-    else
-    {
-        <p>You are a standard user.</p>
-    }
-}
+         <AuthorizeView>
+    <p>User is in role ITDEPT: @context.User.IsInRole("ITDEPT")</p>
+    <p>User is in role HRTeam: @context.User.IsInRole("HRTeam")</p>
+    <p>User is in role Domain Users: @context.User.IsInRole("Domain Users")</p>
+    <p>User is in role Admins: @context.User.IsInRole("Admins")</p>
+</AuthorizeView>
+
 
 
 Welcome to your new app.
 
 @code {
-    protected override void OnInitialized()
-    {
-        UserStateService.OnChange += StateHasChanged;
-    }
+    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
+    private string? surname;
 
-    public void Dispose()
+    protected override async Task OnInitializedAsync()
     {
-        UserStateService.OnChange -= StateHasChanged;
+        var authState = await AuthenticationStateProvider
+            .GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity is not null && user.Identity.IsAuthenticated)
+        {
+            claims = user.Claims;
+            surname = user.FindFirst(c => c.Type == ClaimTypes.Surname)?.Value;
+            StateHasChanged();
+        }
     }
 }

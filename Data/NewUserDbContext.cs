@@ -20,6 +20,7 @@ namespace NewUserSite.Data
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Domain> Domains { get; set; }
         public DbSet<ApplicationPreferences> ApplicationPreferences { get; set; }
+        public DbSet<UserRole> UserRoles { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -40,6 +41,14 @@ namespace NewUserSite.Data
             modelBuilder.Entity<ApplicationPreferences>()
                 .Property(ap => ap.Template)
                 .HasDefaultValue("Job Title");
+
+            modelBuilder.Entity<UserRole>()
+                .HasData(new UserRole
+                {
+                    Id = 1,
+                    Role = Role.Admin,
+                    ADGroupName = "Domain Users"
+                });
         }
     }
 }

@@ -27,8 +27,6 @@ builder.Services.AddAuthorization(options =>
     options.FallbackPolicy = options.DefaultPolicy;
 });
 builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddScoped<UserStateService>();
-builder.Services.AddScoped<IClaimsTransformation, AdClaimsTransformer>();
 
 var app = builder.Build();
 

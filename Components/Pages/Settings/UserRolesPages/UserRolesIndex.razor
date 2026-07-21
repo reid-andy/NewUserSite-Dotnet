@@ -1,0 +1,78 @@
+﻿@rendermode InteractiveServer
+@page "/settings/roles"
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.EntityFrameworkCore
+@using NewUserSite.Components.Shared
+@using NewUserSite.Models
+@using NewUserSite.Data
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+@inject NavigationManager NavigationManager
+
+<h1>Roles:</h1>
+
+<p>Admins can access everything. Users can only submit requests.</p>
+
+<a href="/settings/roles/add" class="btn btn-primary">Add a role</a>
+
+<QuickGrid Class="table" Items="userRoles.AsQueryable()">
+
+    <PropertyColumn Class="text py-1" Property="userRole => userRole.ADGroupName" />
+    <PropertyColumn Class="text py-1" Property="userRole => userRole.Role" />
+
+    <TemplateColumn Context="userRole" Title="Actions">
+        <a href="@($"/settings/roles/edit?id={userRole.Id}")" class="btn btn-warning py-1 my-1">Edit</a>
+        <button class="btn btn-danger py-1 my-1" @onclick="() => confirmDelete(userRole.Id)">Delete</button>
+    </TemplateColumn>
+
+</QuickGrid>
+
+<ConfirmModal @ref="confirmModal" 
+    ModalId="confirmDeleteModal" 
+    Title="Delete Role?" 
+    Message="Are you sure you want to delete this Role?"
+    ConfirmText="Delete" OnConfirm="DeleteUserRole" />
+
+<a href="/settings" class="btn btn-secondary">Back</a>
+
+
+
+@code {
+    private NewUserDbContext context = default!;
+    private ConfirmModal? confirmModal;
+    private List<UserRole> userRoles = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = dbContextFactory.CreateDbContext();
+        await LoadUserRolesAsync();
+    }
+
+    private async Task LoadUserRolesAsync()
+    {
+        userRoles = await context.UserRoles
+            .AsNoTracking()
+            .OrderBy(d => d.Role)
+            .ToListAsync();
+    }
+
+    private async Task confirmDelete(int Id)
+    {
+        if (confirmModal is not null)
+        {
+            await confirmModal.Show(Id);
+        }
+    }
+
+    private async Task DeleteUserRole(int Id)
+    {
+        var userRole = await context.UserRoles.FirstOrDefaultAsync(d => d.Id == Id);
+        if (userRole is null) return;
+        context.UserRoles.Remove(userRole);
+        await context.SaveChangesAsync();
+
+        await LoadUserRolesAsync();
+        StateHasChanged();
+    }
+
+    public async ValueTask DisposeAsync() => await context.DisposeAsync();
+}
