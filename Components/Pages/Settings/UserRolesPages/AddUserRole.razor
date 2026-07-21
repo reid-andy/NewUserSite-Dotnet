@@ -1,0 +1,49 @@
+﻿@rendermode InteractiveServer
+@page "/settings/roles/add"
+@using NewUserSite.Models
+@using NewUserSite.Data
+@using Microsoft.AspNetCore.Components.Forms
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+@inject NavigationManager NavigationManager
+
+<h1 class="mb-3">Add Role</h1>
+
+<EditForm Model="@userRole" FormName="AddRole" OnValidSubmit="@handleValidSubmit">
+    <div class="mb-3">
+        <label for="ADGroupName">Active Directory Group Name:</label>
+        <InputText id="ADGroupName" @bind-Value="@userRole.ADGroupName" class="col-3" />
+    </div>
+    <div class="mb-3">
+        <label for="Role">Role:</label>
+        <InputSelect name="Role" id="Role" @bind-value="@userRole.Role">
+            @foreach (var role in Enum.GetValues(typeof(Role)))
+            {
+                <option value="@role">@role</option>
+            }
+        </InputSelect>
+    </div>
+    <div>
+        <a href="/settings/roles" class="btn btn-secondary">Back</a>
+        <button type="submit" class="btn btn-primary">Add Role</button>
+    </div>
+
+</EditForm>
+
+
+
+
+@code {
+    private UserRole userRole = new UserRole();
+    private NewUserDbContext context;
+
+    public async Task handleValidSubmit(EditContext editContext)
+    {
+        context = dbContextFactory.CreateDbContext();
+        var newUserRole = (UserRole)editContext.Model;
+        context.UserRoles.Add(newUserRole);
+        await context.SaveChangesAsync();
+        NavigationManager.NavigateTo("/settings/roles");
+    }
+
+}
