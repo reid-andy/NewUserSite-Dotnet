@@ -1,6 +1,7 @@
 ﻿@page "/"
 @rendermode InteractiveServer
 @attribute [Authorize]
+@inherits RoleListeningComponentBase
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using NewUserSite.Services
@@ -12,13 +13,13 @@
          <h1>Home</h1>
 
          <AuthorizeView>
-    <p>User is in role ITDEPT: @context.User.IsInRole("ITDEPT")</p>
-    <p>User is in role HRTeam: @context.User.IsInRole("HRTeam")</p>
-    <p>User is in role Domain Users: @context.User.IsInRole("Domain Users")</p>
-    <p>User is in role Admins: @context.User.IsInRole("Admins")</p>
-</AuthorizeView>
-
-
+            <p>User is in role ITDEPT: @context.User.IsInRole("ITDEPT")</p>
+            <p>User is in role HRTeam: @context.User.IsInRole("HRTeam")</p>
+            <p>User is in role Domain Users: @context.User.IsInRole("Domain Users")</p>
+            <p>User is in role Admins: @context.User.IsInRole("Admins")</p>
+            <p>Admin roles: @(UserRoleService.AdminRoles?.Count ?? 0)</p>
+            <p>User roles: @(UserRoleService.UserRoles?.Count ?? 0)</p>
+        </AuthorizeView>
 
 Welcome to your new app.
 
@@ -28,6 +29,7 @@ Welcome to your new app.
 
     protected override async Task OnInitializedAsync()
     {
+        await base.OnInitializedAsync();
         var authState = await AuthenticationStateProvider
             .GetAuthenticationStateAsync();
         var user = authState.User;
