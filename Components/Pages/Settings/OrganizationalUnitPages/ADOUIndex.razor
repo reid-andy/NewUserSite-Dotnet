@@ -1,5 +1,8 @@
 ﻿@rendermode InteractiveServer
 @page "/settings/user-organizational-units"
+@attribute [Authorize]
+@inherits RoleListeningComponentBase
+@using Microsoft.AspNetCore.Authorization
 @using NewUserSite.Models
 @using NewUserSite.Data
 @using NewUserSite.Components.Shared

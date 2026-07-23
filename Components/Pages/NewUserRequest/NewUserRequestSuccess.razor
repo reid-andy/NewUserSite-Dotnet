@@ -1,5 +1,8 @@
 ﻿@rendermode InteractiveServer
 @page "/new-user-request/success"
+@attribute [Authorize]
+@inherits RoleListeningComponentBase
+@using Microsoft.AspNetCore.Authorization
 @namespace NewUserSite.Components.NewUserRequest
 @using NewUserSite.Models
 @using NewUserSite.Services

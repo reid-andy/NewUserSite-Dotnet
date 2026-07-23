@@ -1,5 +1,8 @@
 ﻿@rendermode InteractiveServer
 @page "/settings/domains"
+@attribute [Authorize]
+@inherits RoleListeningComponentBase
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.QuickGrid
 @using Microsoft.EntityFrameworkCore
 @using NewUserSite.Components.Shared
