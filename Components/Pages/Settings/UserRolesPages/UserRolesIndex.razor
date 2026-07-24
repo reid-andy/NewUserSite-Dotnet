@@ -33,6 +33,12 @@
     Message="Are you sure you want to delete this Role?"
     ConfirmText="Delete" OnConfirm="DeleteUserRole" />
 
+<ConfirmModal @ref="deniedModal"
+              ModalId="denyDeleteModal"
+              Title="Delete Denied"
+              Message="You must have at least one Admin role."
+              ConfirmText="Ok" />
+
 <a href="/settings" class="btn btn-secondary">Back</a>
 
 
@@ -40,6 +46,7 @@
 @code {
     private NewUserDbContext context = default!;
     private ConfirmModal? confirmModal;
+    private ConfirmModal? deniedModal;
     private List<UserRole> userRoles = new();
 
     protected override async Task OnInitializedAsync()
@@ -58,9 +65,21 @@
 
     private async Task confirmDelete(int Id)
     {
-        if (confirmModal is not null)
+        if (userRoles.Count(r => r.Role == Role.Admin) > 1)
         {
-            await confirmModal.Show(Id);
+
+
+            if (confirmModal is not null)
+            {
+                await confirmModal.Show(Id);
+            }
+        }
+        else
+        {
+            if (deniedModal is not null)
+            {
+                await deniedModal.Show(Id);
+            }
         }
     }
 
@@ -70,7 +89,6 @@
         if (userRole is null) return;
         context.UserRoles.Remove(userRole);
         await context.SaveChangesAsync();
-
         await LoadUserRolesAsync();
         StateHasChanged();
     }

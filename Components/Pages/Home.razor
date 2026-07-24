@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/homepage"
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
@@ -19,7 +19,6 @@
 Welcome to your new app.
 
 @code {
-    private IEnumerable<Claim> claims = Enumerable.Empty<Claim>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -29,7 +28,6 @@ Welcome to your new app.
 
         if (user.Identity is not null && user.Identity.IsAuthenticated)
         {
-            claims = user.Claims;
             StateHasChanged();
         }
     }
