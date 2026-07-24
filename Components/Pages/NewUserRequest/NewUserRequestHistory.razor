@@ -8,11 +8,19 @@
 @using NewUserSite.Components.Shared
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
 
-<h1>Request History</h1>
+<h1 class="mb-5">Request History</h1>
 
-<QuickGrid Class="table" Items="newUsers.AsQueryable()">
-    <PropertyColumn Property="newUser => newUser.FirstName" Title="First Name" />
-    <PropertyColumn Property="newUser => newUser.LastName" Title="Last Name" />
+<div class="row mb-3">
+    <div class="col-4">
+        <div class="input-group">
+            <input type="text" class="form-control border-primary" placeholder="Search by name" @bind="nameFilter" @bind:event="oninput" />
+            <button type="button" class="btn btn-outline-secondary" @onclick="@clearSearchBox">Clear</button>
+        </div>
+    </div>
+</div>
+
+<QuickGrid Class="table" Items="filteredUsers.AsQueryable()">
+    <PropertyColumn Property="newUser => newUser.GetDisplayName()" Title="Name" />
     <PropertyColumn Property="newUser => newUser.ADOrganizationalUnit.Name" Title="@preferences.OrganizationalUnit" />
     <PropertyColumn Property="newUser => newUser.NewUserTemplate.TemplateName" Title="@preferences.Template" />
     <PropertyColumn Property="newUser => newUser.SupervisorEmail" Title="Supervisor Email Address"/>
@@ -45,6 +53,12 @@
     private ConfirmModal? confirmModal;
     private List<NewUser> newUsers = new();
     private ApplicationPreferences preferences = new();
+    private string nameFilter = string.Empty;
+
+    private List<NewUser> filteredUsers => newUsers
+        .Where(n => string.IsNullOrEmpty(nameFilter) || n.GetDisplayName().Contains(nameFilter, StringComparison.OrdinalIgnoreCase))
+        .ToList();
+
 
     protected override async Task OnInitializedAsync()
     {
@@ -80,6 +94,12 @@
         await context.SaveChangesAsync();
 
         await LoadNewUsersAsync();
+        StateHasChanged();
+    }
+
+    private void clearSearchBox()
+    {
+        nameFilter = string.Empty;
         StateHasChanged();
     }
 
