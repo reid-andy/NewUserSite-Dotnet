@@ -1,0 +1,20 @@
+﻿@rendermode InteractiveServer
+@page "/settings/preferences"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+
+<h1 class="mb-3">Preferences</h1>
+
+
+    <div class="mb-5">
+<VerbiagePreferences />
+    </div>
+    <div class="mb-3">
+<UserCreationPreferences />
+    </div>
+<a href="/settings" class="btn btn-secondary">Back</a>
+
+
+@code {
+
+}

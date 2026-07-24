@@ -11,6 +11,7 @@ namespace NewUserSite.Models
         public string OrganizationalUnit { get; set; } = "Department";
         [MaxLength(100)]
         public string Template { get; set; } = "Job Title";
+        public bool AutoApproveNewUserRequests { get; set; }
 
     }
 }

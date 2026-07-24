@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using NewUserSite.Components;
 using NewUserSite.Data;
 using NewUserSite.Services;
-using NewUserSite.Hubs;
 using Microsoft.AspNetCore.Authentication.Negotiate;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,7 +13,6 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddSingleton<UserRoleService>();
 builder.Services.AddTransient<NewUserService>();
-builder.Services.AddScoped<RoleHubClientService>();
 builder.Services.AddScoped<DataStateService>();
 builder.Services.AddDbContextFactory<NewUserDbContext>((DbContextOptionsBuilder options) => options.UseMySQL(connectionString));
 builder.Services.AddDataProtection()
@@ -28,8 +26,6 @@ builder.Services.AddAuthorization(options =>
     options.FallbackPolicy = options.DefaultPolicy;
 });
 builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddSignalR();
-builder.Services.AddScoped<RoleChangeNotificationService>();
 
 var app = builder.Build();
 
@@ -51,6 +47,5 @@ app.MapRazorComponents<App>()
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapHub<RoleHub>("/rolehub");
 
 app.Run();

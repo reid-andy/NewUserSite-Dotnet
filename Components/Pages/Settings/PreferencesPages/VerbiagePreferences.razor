@@ -1,7 +1,5 @@
 ﻿@rendermode InteractiveServer
-@page "/settings/preferences"
 @attribute [Authorize]
-@inherits RoleListeningComponentBase
 @using Microsoft.AspNetCore.Authorization
 @using NewUserSite.Models
 @using NewUserSite.Data
@@ -10,11 +8,11 @@
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
 @inject NavigationManager NavigationManager
 
-<h1 class="mb-3">Preferences</h1>
+<h2 class="mb-3">Verbiage Preferences</h2>
 
 <div>
     <p>
-        Here you can change the verbiage reflected on the new user request page if so desired. 
+        Here you can change the verbiage reflected on the new user request page if so desired.
     </p>
     <p>
         By default, these are set to terms that relate better for non-technical users.
@@ -27,34 +25,33 @@
 }
 else
 {
-    @if(editMode) {
-    <EditForm Model="@preferences" FormName="PreferencesForm" OnValidSubmit="@handleValidSubmit">
-        <div class="mb-3">
-            <label for="OrganizationalUnit">Organizational Unit:</label>
-            <InputText id="OrganizationalUnit" @bind-Value="@preferences.OrganizationalUnit" class="col-3" />
-        </div>
-        <div class="mb-3">
-            <label for="Template">Template Account:</label>
-            <InputText id="Template" @bind-Value="@preferences.Template" class="col-3" />
-        </div>
-        <div>
-            <a href="/settings" class="btn btn-secondary">Back</a>
-            <button type="submit" class="btn btn-primary">Save Preferences</button>
-            <button type="button" class="btn btn-danger" @onclick="@toggleEdit">Cancel</button>
-        </div>
-    </EditForm>
+    @if (editMode)
+    {
+        <EditForm Model="@preferences" FormName="PreferencesForm" OnValidSubmit="@handleValidSubmit">
+            <div class="mb-3 fw-bold">
+                <label for="OrganizationalUnit">Organizational Unit:</label>
+                <InputText id="OrganizationalUnit" @bind-Value="@preferences.OrganizationalUnit" class="col-3" />
+            </div>
+            <div class="mb-3 fw-bold">
+                <label for="Template">Template Account:</label>
+                <InputText id="Template" @bind-Value="@preferences.Template" class="col-3" />
+            </div>
+            <div>
+                <button type="submit" class="btn btn-primary">Save Preferences</button>
+                <button type="button" class="btn btn-danger" @onclick="@toggleEdit">Cancel</button>
+            </div>
+        </EditForm>
     }
     else
     {
-        <div class="mb-3">
+        <div class="mb-3 fw-bold">
             Organizational Unit: @preferences.OrganizationalUnit
         </div>
-        <div class="mb-3">
+        <div class="mb-3 fw-bold">
             Template Account: @preferences.Template
         </div>
         <div>
-            <a href="/settings" class="btn btn-secondary">Back</a>
-            <button type="button" class="btn btn-warning" @onclick="@toggleEdit">Edit Preferences</button>
+            <button type="button" class="btn btn-warning" @onclick="@toggleEdit">Edit Verbiage</button>
         </div>
     }
 }

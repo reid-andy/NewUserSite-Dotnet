@@ -1,0 +1,87 @@
+﻿@rendermode InteractiveServer
+@page "/new-user-request/history"
+@attribute [Authorize]
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.QuickGrid
+@using Microsoft.EntityFrameworkCore
+@using NewUserSite.Data
+@using NewUserSite.Models
+@using NewUserSite.Components.Shared
+@inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
+
+<h1>Request History</h1>
+
+<QuickGrid Class="table" Items="newUsers.AsQueryable()">
+    <PropertyColumn Property="newUser => newUser.FirstName" Title="First Name" />
+    <PropertyColumn Property="newUser => newUser.LastName" Title="Last Name" />
+    <PropertyColumn Property="newUser => newUser.ADOrganizationalUnit.Name" Title="@preferences.OrganizationalUnit" />
+    <PropertyColumn Property="newUser => newUser.NewUserTemplate.TemplateName" Title="@preferences.Template" />
+    <PropertyColumn Property="newUser => newUser.SupervisorEmail" Title="Supervisor Email Address"/>
+    <PropertyColumn Property="newUser => newUser.CreatedBy" Title="Requested By"/>
+    <PropertyColumn Property="newUser => newUser.RequestedDate" Title="Requested Date"/>
+    <PropertyColumn Property="@(newUser => newUser.ApprovedDate.ToString() ?? "Not yet approved")" Title="Approved Date" />
+    <PropertyColumn Property="@(newUser => newUser.ApprovedBy ?? "Not yet approved")" Title="Approved By"/>
+
+    <TemplateColumn Context="newUser" Title="Actions">
+        <a href="@($"/new-user-request/edit?id={newUser.Id}")" class="btn btn-warning py-1 my-1">Edit</a>
+        @if (newUser.ApprovedBy is null)
+        {
+            <button class="btn btn-danger py-1 my-1" @onclick="() => confirmDelete(newUser.Id)">Delete</button>
+        }
+        else
+        {
+            <button class="btn btn-danger py-1 my-1" disabled>Delete</button>
+        }
+    </TemplateColumn>
+</QuickGrid>
+
+<ConfirmModal @ref="confirmModal"
+              ModalId="confirmDeleteModal"
+              Title="Delete Request?"
+              Message="Are you sure you want to delete this Request?"
+              ConfirmText="Delete" OnConfirm="DeleteRequest" />
+
+@code {
+    private NewUserDbContext context = default!;
+    private ConfirmModal? confirmModal;
+    private List<NewUser> newUsers = new();
+    private ApplicationPreferences preferences = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        context = dbContextFactory.CreateDbContext();
+        await LoadNewUsersAsync();
+        preferences = await context.ApplicationPreferences.FirstOrDefaultAsync();
+    }
+
+    private async Task LoadNewUsersAsync()
+    {
+        newUsers = await context.NewUsers
+            .Include(a => a.ADOrganizationalUnit)
+            .Include(t => t.NewUserTemplate)
+            .Include(d => d.Domain)
+            .AsNoTracking()
+            .OrderBy(n => n.RequestedDate)
+            .ToListAsync();
+    }
+
+    private async Task confirmDelete(int Id)
+    {
+        if (confirmModal is not null)
+        {
+            await confirmModal.Show(Id);
+        }
+    }
+
+    private async Task DeleteRequest(int Id)
+    {
+        var userToDelete = await context.NewUsers.FirstOrDefaultAsync(t => t.Id == Id);
+        if (userToDelete is null) return;
+        context.NewUsers.Remove(userToDelete);
+        await context.SaveChangesAsync();
+
+        await LoadNewUsersAsync();
+        StateHasChanged();
+    }
+
+}

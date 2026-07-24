@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NewUserSite.Data;
 
@@ -10,9 +11,11 @@ using NewUserSite.Data;
 namespace NewUserSite.Migrations
 {
     [DbContext(typeof(NewUserDbContext))]
-    partial class NewUserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260723143717_NewUserRequestTableUpdate")]
+    partial class NewUserRequestTableUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -128,9 +131,6 @@ namespace NewUserSite.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    b.Property<bool>("AutoApproveNewUserRequests")
-                        .HasColumnType("tinyint(1)");
-
                     b.Property<string>("OrganizationalUnit")
                         .IsRequired()
                         .ValueGeneratedOnAdd()
@@ -153,7 +153,6 @@ namespace NewUserSite.Migrations
                         new
                         {
                             Id = 1,
-                            AutoApproveNewUserRequests = false,
                             OrganizationalUnit = "Department",
                             Template = "Job Title"
                         });
@@ -199,7 +198,7 @@ namespace NewUserSite.Migrations
                     b.Property<string>("ApprovedBy")
                         .HasColumnType("longtext");
 
-                    b.Property<DateTime?>("ApprovedDate")
+                    b.Property<DateTime>("ApprovedDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("CreatedBy")
@@ -217,7 +216,7 @@ namespace NewUserSite.Migrations
                     b.Property<int?>("NewUserTemplateId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("RequestedDate")
+                    b.Property<DateTime>("RequestedDate")
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("SupervisorEmail")

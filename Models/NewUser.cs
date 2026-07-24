@@ -12,11 +12,12 @@ namespace NewUserSite.Models
         public NewUserTemplate? NewUserTemplate { get; set; }
         public Domain? Domain { get; set; }
         public string? SupervisorEmail { get; set; }
-        // Todo: Implement real auth
-        //public AppUser? CreatedBy { get; set; }
-        public DateTime CreatedDate { get; set; }
+        public string? CreatedBy { get; set; }
+        public string? ApprovedBy { get; set; }
+        public DateTime? RequestedDate { get; set; }
+        public DateTime? ApprovedDate { get; set; }
 
-        public string getSAMAccountName()
+        public string GetSAMAccountName()
         {
             if (this.FirstName != null && this.LastName != null)
             {
@@ -28,7 +29,7 @@ namespace NewUserSite.Models
             }
         }
 
-        public string getDisplayName()
+        public string GetDisplayName()
         {
             if (this.FirstName != null && this.LastName != null)
             {
@@ -40,11 +41,11 @@ namespace NewUserSite.Models
             }
         }
 
-        public string getDistinguishedName()
+        public string GetDistinguishedName()
         {
             if (this.ADOrganizationalUnit != null)
             {
-                return $"CN={this.getSAMAccountName()},{this.ADOrganizationalUnit.ADDistinguishedName}";
+                return $"CN={this.GetSAMAccountName()},{this.ADOrganizationalUnit.ADDistinguishedName}";
             }
             else
             {
@@ -52,9 +53,9 @@ namespace NewUserSite.Models
             }
         }
 
-        public string getEmailAddress()
+        public string GetEmailAddress()
         {
-            return $"{this.getSAMAccountName()}@{this.Domain.Name}";
+            return $"{this.GetSAMAccountName()}@{this.Domain.Name}";
         }
     }
 }

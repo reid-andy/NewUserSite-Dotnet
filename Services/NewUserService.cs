@@ -32,24 +32,24 @@ namespace NewUserSite.Services
                     Console.WriteLine($"Connected to {adSearcher.DomainControllerLocation}");
                     UserPrincipal templateAccount = UserPrincipal.FindByIdentity(principalContext, newUser.NewUserTemplate.TemplateSAMAccountName) ?? throw new Exception("Template user not found in Active Directory.");
 
-                    UserPrincipal? accountCheck = UserPrincipal.FindByIdentity(principalContext, newUser.getSAMAccountName());
+                    UserPrincipal? accountCheck = UserPrincipal.FindByIdentity(principalContext, newUser.GetSAMAccountName());
                     if (accountCheck != null)
                     {
-                        throw new Exception($"An account with the SAM account name {newUser.getSAMAccountName()} already exists in Active Directory.");
+                        throw new Exception($"An account with the SAM account name {newUser.GetSAMAccountName()} already exists in Active Directory.");
                     }
                     else
                     {
-                        Console.WriteLine($"Creating new user {newUser.getSAMAccountName()}");
+                        Console.WriteLine($"Creating new user {newUser.GetSAMAccountName()}");
                         using (UserPrincipal newUserAccount = new UserPrincipal(principalContext))
                         {
-                            newUserAccount.Name = newUser.getDisplayName();
-                            newUserAccount.SamAccountName = newUser.getSAMAccountName();
-                            newUserAccount.DisplayName = newUser.getDisplayName();
+                            newUserAccount.Name = newUser.GetDisplayName();
+                            newUserAccount.SamAccountName = newUser.GetSAMAccountName();
+                            newUserAccount.DisplayName = newUser.GetDisplayName();
                             newUserAccount.GivenName = newUser.FirstName;
                             newUserAccount.Surname = newUser.LastName;
                             newUserAccount.Description = templateAccount.Description;
-                            newUserAccount.UserPrincipalName = newUser.getEmailAddress();
-                            newUserAccount.EmailAddress = newUser.getEmailAddress();
+                            newUserAccount.UserPrincipalName = newUser.GetEmailAddress();
+                            newUserAccount.EmailAddress = newUser.GetEmailAddress();
                             newUserAccount.Enabled = true;
                             newUserAccount.Save();
 
@@ -62,17 +62,17 @@ namespace NewUserSite.Services
                                     userEntry.MoveTo(targetOU);
                                     userEntry.CommitChanges();
                                     targetOU.Close();
-                                    Console.WriteLine($"{newUser.getSAMAccountName()} moved to {newUser.ADOrganizationalUnit.Name}");
+                                    Console.WriteLine($"{newUser.GetSAMAccountName()} moved to {newUser.ADOrganizationalUnit.Name}");
                                 }
                             }
                             catch (COMException comEx)
                             {
                                 Console.WriteLine($"Failed to move user to target OU: {comEx.Message}");
                             }
-                            Console.WriteLine($"New user {newUser.getSAMAccountName()} created successfully.");
+                            Console.WriteLine($"New user {newUser.GetSAMAccountName()} created successfully.");
                         }
                     }
-                    UserPrincipal targetAccount = UserPrincipal.FindByIdentity(principalContext, newUser.getSAMAccountName());
+                    UserPrincipal targetAccount = UserPrincipal.FindByIdentity(principalContext, newUser.GetSAMAccountName());
 
                     var templateUserGroups = templateAccount.GetGroups()
                         .OfType<GroupPrincipal>()
@@ -92,7 +92,7 @@ namespace NewUserSite.Services
                         }
                         catch (PrincipalExistsException)
                         {
-                            Console.WriteLine($"User {newUser.getSAMAccountName()} is already a member of group {groupName}. Skipping.");
+                            Console.WriteLine($"User {newUser.GetSAMAccountName()} is already a member of group {groupName}. Skipping.");
                         }
                         catch (PrincipalOperationException ex)
                         {

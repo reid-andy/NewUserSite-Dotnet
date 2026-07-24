@@ -1,8 +1,8 @@
 ﻿@rendermode InteractiveServer
 @page "/new-user-request"
 @attribute [Authorize]
-@inherits RoleListeningComponentBase
 @using Microsoft.AspNetCore.Authorization
+@using Microsoft.AspNetCore.Components.Authorization
 @using NewUserSite.Models
 @using NewUserSite.Data
 @using NewUserSite.Services
@@ -12,6 +12,7 @@
 @inject IDbContextFactory<NewUserSite.Data.NewUserDbContext> dbContextFactory
 @inject NavigationManager NavigationManager
 @inject DataStateService DataStateService
+@inject AuthenticationStateProvider AuthenticationStateProvider
 
 <h1 class="mb-3">New User Request</h1>
 
@@ -120,20 +121,30 @@
         _ = Task.Run(async () => {
             await createNewUserAsync(editContext);
         });
-        
+
     }
 
     public async Task createNewUserAsync(EditContext editContext)
     {
         var newUserRequest = (NewUser)editContext.Model;
         using var context = dbContextFactory.CreateDbContext();
+        var authState = await AuthenticationStateProvider
+            .GetAuthenticationStateAsync();
+        var requestor = authState.User.Identity.Name;
+        requestor = requestor.Split('\\')[1];
 
-        newUserRequest.CreatedDate = DateTime.UtcNow;
+        newUserRequest.RequestedDate = DateTime.UtcNow;
+        newUserRequest.CreatedBy = requestor;
         newUserRequest.ADOrganizationalUnit = await context.ADOrganizationalUnits.FindAsync(selectedOuId);
         newUserRequest.NewUserTemplate = await context.NewUserTemplates.FindAsync(selectedTemplateId);
         newUserRequest.Domain = await context.Domains.FindAsync(selectedDomainId);
 
-        NewUserService.CreateNewUser(adSearcher, newUserRequest);
+        if (preferences.AutoApproveNewUserRequests)
+        {
+            newUserRequest.ApprovedBy = "Auto-approved";
+            newUserRequest.ApprovedDate = DateTime.UtcNow;
+            NewUserService.CreateNewUser(adSearcher, newUserRequest);
+        }
 
         context.NewUsers.Add(newUserRequest);
         await context.SaveChangesAsync();
