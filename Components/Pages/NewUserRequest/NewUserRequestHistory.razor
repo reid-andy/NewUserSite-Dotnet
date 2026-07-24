@@ -32,7 +32,7 @@
 
     <TemplateColumn Context="newUser" Title="Actions">
         <a href="@($"/new-user-request/edit?id={newUser.Id}")" class="btn btn-warning py-1 my-1">Edit</a>
-        @if (newUser.ApprovedBy is null)
+        @if (newUser.RequestStatus == RequestStatus.Waiting)
         {
             <button class="btn btn-danger py-1 my-1" @onclick="() => confirmDelete(newUser.Id)">Delete</button>
         }
