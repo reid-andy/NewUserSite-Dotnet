@@ -1,4 +1,7 @@
-﻿@page "/new-user-request/history"
+﻿@page "/new-user-request/current"
+
+<h1>Current New User Requests</h1>
+
 @attribute [Authorize]
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.QuickGrid
@@ -23,12 +26,11 @@
     <PropertyColumn Property="newUser => newUser.GetDisplayName()" Title="Name" />
     <PropertyColumn Property="newUser => newUser.ADOrganizationalUnit.Name" Title="@preferences.OrganizationalUnit" />
     <PropertyColumn Property="newUser => newUser.NewUserTemplate.TemplateName" Title="@preferences.Template" />
-    <PropertyColumn Property="newUser => newUser.SupervisorEmail" Title="Supervisor Email Address"/>
-    <PropertyColumn Property="newUser => newUser.CreatedBy" Title="Requested By"/>
+    <PropertyColumn Property="newUser => newUser.SupervisorEmail" Title="Supervisor Email Address" />
+    <PropertyColumn Property="newUser => newUser.CreatedBy" Title="Requested By" />
     <PropertyColumn Property="newUser => newUser.RequestedDate" Format="MM-dd-yyyy" Title="Requested Date" />
     <PropertyColumn Property="newUser => newUser.ApprovedDate" Format="MM-dd-yyyy" Title="Approved Date" />
     <PropertyColumn Property="newUser => newUser.ApprovedBy" Title="Approved By" />
-    <PropertyColumn Property="newUser => newUser.RequestStatus" Title="Request Status"/>
 
     <TemplateColumn Context="newUser" Title="Actions">
         <a href="@($"/new-user-request/edit?id={newUser.Id}")" class="btn btn-warning py-1 my-1">Edit</a>
@@ -73,6 +75,7 @@
     private async Task LoadNewUsersAsync()
     {
         newUsers = await context.NewUsers
+            .Where(r => r.RequestStatus == RequestStatus.Waiting)
             .Include(a => a.ADOrganizationalUnit)
             .Include(t => t.NewUserTemplate)
             .Include(d => d.Domain)

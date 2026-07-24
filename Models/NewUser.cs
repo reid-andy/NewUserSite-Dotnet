@@ -2,6 +2,7 @@
 
 namespace NewUserSite.Models
 {
+    public enum RequestStatus { Waiting, Approved, Denied };
     public class NewUser
     {
         [Key]
@@ -16,6 +17,7 @@ namespace NewUserSite.Models
         public string? ApprovedBy { get; set; }
         public DateTime? RequestedDate { get; set; }
         public DateTime? ApprovedDate { get; set; }
+        public RequestStatus? RequestStatus { get; set; }
 
         public string GetSAMAccountName()
         {
